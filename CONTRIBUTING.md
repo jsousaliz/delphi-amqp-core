@@ -1,7 +1,5 @@
 # Contribuindo
 
-Status: pronto para publicação inicial.
-
 ## Índice
 
 - [Diretrizes](#diretrizes)
