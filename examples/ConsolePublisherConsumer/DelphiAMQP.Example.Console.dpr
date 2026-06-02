@@ -71,7 +71,7 @@ begin
       False);
     Consumer.Start;
 
-    Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do DelphiAMQP'));
+    Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do Delphi AMQP Core'));
     if MessageReceived.WaitFor(5000) <> wrSignaled then
       raise Exception.Create('Timeout waiting for consumed message.');
     Consumer.Stop;

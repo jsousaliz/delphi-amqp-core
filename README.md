@@ -1,6 +1,6 @@
-# DelphiAMQP
+# Delphi AMQP Core
 
-DelphiAMQP e uma biblioteca Delphi open source para comunicacao nativa com
+Delphi AMQP Core e uma biblioteca Delphi open source para comunicacao nativa com
 brokers AMQP 0-9-1, com foco inicial em RabbitMQ. O objetivo e permitir
 conectar, publicar, consumir, monitorar e administrar filas sem depender de
 componentes Delphi externos.

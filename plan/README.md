@@ -1,4 +1,4 @@
-# Development Plan DelphiAMQP
+# Development Plan Delphi AMQP Core
 
 Este diretorio contem o planejamento operacional do projeto e serve como guia
 para execucao por etapas.

@@ -1,6 +1,6 @@
 # ConsolePublisherConsumer
 
-Exemplo console didatico de uso da API publica do DelphiAMQP.
+Exemplo console didatico de uso da API publica do Delphi AMQP Core.
 
 Ele demonstra a forma esperada de:
 

@@ -1,6 +1,6 @@
 # Arquitetura
 
-DelphiAMQP sera organizado em camadas pequenas e testaveis.
+Delphi AMQP Core sera organizado em camadas pequenas e testaveis.
 
 ## Camadas
 

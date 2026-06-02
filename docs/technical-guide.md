@@ -1,4 +1,4 @@
-# Guia Tecnico do DelphiAMQP
+# Guia Tecnico do Delphi AMQP Core
 
 Este documento explica como o componente funciona internamente. A ideia e
 manter a implementacao transparente para usuarios avancados e contribuidores.
@@ -25,7 +25,7 @@ esses bytes.
 Fluxo conceitual:
 
 ```text
-DelphiAMQP
+Delphi AMQP Core
   -> abre socket TCP
   -> envia/recebe frames AMQP
   -> RabbitMQ
@@ -977,7 +977,7 @@ Consumer := Channel.BasicConsume(
   False);
 
 Consumer.Start;
-Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do DelphiAMQP'));
+Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do Delphi AMQP Core'));
 
 if MessageReceived.WaitFor(5000) <> wrSignaled then
   raise Exception.Create('Timeout waiting for consumed message.');
