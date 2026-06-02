@@ -1,0 +1,38 @@
+# Delphi build artifacts
+__history/
+__recovery/
+*.dcu
+*.ddp
+*.dproj.local
+*.identcache
+*.local
+*.map
+*.mes
+*.otares
+*.exe
+*.dll
+*.bpl
+*.res
+*.rsm
+*.stat
+*.tvsconfig
+*.~*
+
+# Build outputs
+bin/
+lib/
+Win32/
+Win64/
+Debug/
+Release/
+
+# IDE/user files
+.vs/
+.idea/
+*.suo
+*.user
+
+# Test and temporary outputs
+coverage/
+tmp/
+temp/
