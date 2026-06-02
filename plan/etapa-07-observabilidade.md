@@ -11,8 +11,7 @@ Status: implementada.
 - Logger nulo default.
 - Exemplo com logger simples.
 - Test logger em memória para testes unitários.
-- Incluir campo `DurationMS` no evento para medição futura de operações
-  bloqueantes.
+- Incluir campo `DurationMS` no evento para medição de operações bloqueantes.
 
 ## Definicao de pronto
 

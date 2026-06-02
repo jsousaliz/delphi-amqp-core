@@ -3,6 +3,7 @@ unit DelphiAMQP.Logging;
 interface
 
 uses
+  System.Classes,
   System.SysUtils,
   DelphiAMQP.Interfaces,
   DelphiAMQP.Types;
@@ -57,6 +58,7 @@ type
 
   TAMQPLogger = class
   public
+    class function ElapsedMilliseconds(const AStartTick: UInt64): UInt64; static;
     class function Null: IAMQPLogger; static;
     class procedure Trace(
       const ALogger: IAMQPLogger;
@@ -150,6 +152,17 @@ begin
   LEvent.ErrorClass := AErrorClass;
   LEvent.DurationMS := ADurationMS;
   ALogger.Log(LEvent);
+end;
+
+class function TAMQPLogger.ElapsedMilliseconds(const AStartTick: UInt64): UInt64;
+var
+  LCurrentTick: UInt64;
+begin
+  LCurrentTick := TThread.GetTickCount64;
+  if LCurrentTick >= AStartTick then
+    Result := LCurrentTick - AStartTick
+  else
+    Result := 0;
 end;
 
 class procedure TAMQPLogger.Error(

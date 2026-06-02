@@ -109,6 +109,8 @@ constructor TAMQPConsumer.Create(
   const ALogger: IAMQPLogger);
 begin
   inherited Create;
+  FLock := TObject.Create;
+
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
   if not Assigned(AMessageHandler) then
@@ -125,7 +127,6 @@ begin
   FMessageHandler := AMessageHandler;
   FAutoAck := AAutoAck;
   FLogger := ALogger;
-  FLock := TObject.Create;
 end;
 
 function TAMQPConsumer.ChannelId: UInt16;
@@ -183,7 +184,8 @@ end;
 
 destructor TAMQPConsumer.Destroy;
 begin
-  Stop;
+  if FLock <> nil then
+    Stop;
   FLock.Free;
   inherited;
 end;

@@ -1,6 +1,6 @@
 # Etapa 9: Documentação Final
 
-Status: em andamento.
+Status: implementada.
 
 ## Entregas
 

@@ -1,7 +1,5 @@
 # Documentação
 
-Status: em desenvolvimento.
-
 Esta pasta concentra a documentação versionada do Delphi AMQP Core.
 
 ## Guias
@@ -11,5 +9,5 @@ Esta pasta concentra a documentação versionada do Delphi AMQP Core.
 - [Arquitetura](architecture.md): visão das camadas, memória, threading e
   compatibilidade inicial.
 - [Guia técnico](technical-guide.md): funcionamento interno do transporte TCP,
-  frames AMQP, métodos de protocolo, conexão, fila, publicação, consumo e
-  observabilidade.
+  frames AMQP, métodos de protocolo, conexão, fila, publicação, consumo,
+  observabilidade e tratamento de erros.

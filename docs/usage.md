@@ -1,7 +1,5 @@
 # Guia de Uso
 
-Status: em desenvolvimento.
-
 ## Índice
 
 - [Instalação manual](#instalação-manual)
@@ -34,7 +32,8 @@ Connection.Connect;
 
 Na etapa atual, `Connect` executa handshake real com RabbitMQ,
 `CreateChannel` abre um canal AMQP e as operações de fila/publicação/consumo já
-enviam comandos AMQP reais.
+enviam comandos AMQP reais. `Channel.Close` fecha o canal com `channel.close` e
+aguarda `channel.close-ok`.
 
 ## Publicação
 
@@ -50,6 +49,7 @@ Channel.Publish('', 'minha.fila', TAMQPMessage.FromText('Mensagem'));
 Channel.QueueDeclare('minha.fila', True, False, False);
 Channel.QueuePurge('minha.fila');
 Channel.QueueDelete('minha.fila');
+Channel.Close;
 ```
 
 ## Consumo
@@ -88,7 +88,9 @@ Cada evento recebido em `Log` contém:
 - `ConnectionId`: identificador local da conexão.
 - `ChannelId`: canal AMQP associado ao evento, quando existir.
 - `ErrorClass`: classe da exceção, quando for um evento de erro.
-- `DurationMS`: duração em milissegundos, reservado para operações medidas.
+- `DurationMS`: duração em milissegundos para operações bloqueantes medidas,
+  como abertura de conexão, abertura de canal, operações de fila e
+  `basic.consume`.
 
 ```pascal
 type

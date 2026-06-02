@@ -45,6 +45,7 @@ type
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   DelphiAMQP.Channel,
   DelphiAMQP.Logging;
@@ -80,12 +81,15 @@ end;
 procedure TAMQPConnection.Connect;
 var
   LFrame: TAMQPFrame;
+  LStart: TAMQPConnectionStart;
   LTune: TAMQPConnectionTune;
+  LStartTick: UInt64;
 begin
   if FState = csConnected then
     Exit;
 
   SetState(csConnecting);
+  LStartTick := TThread.GetTickCount64;
   TAMQPLogger.Info(
     FLogger,
     lekConnection,
@@ -114,6 +118,15 @@ begin
       AMQP_LOG_PROTOCOL_HEADER);
 
     LFrame := ReceiveExpectedMethod(AMQP_CLASS_CONNECTION, AMQP_CONNECTION_START);
+    LStart := TAMQPMethodCodec.ReadConnectionStart(LFrame);
+    if not LStart.SupportsMechanism(AMQP_SASL_MECHANISM_PLAIN) then
+      raise EAMQPConnectionError.CreateFmt(
+        'AMQP server does not support SASL mechanism %s. Announced mechanisms: %s.',
+        [AMQP_SASL_MECHANISM_PLAIN, LStart.Mechanisms]);
+    if not LStart.SupportsLocale(AMQP_LOCALE_EN_US) then
+      raise EAMQPConnectionError.CreateFmt(
+        'AMQP server does not support locale %s. Announced locales: %s.',
+        [AMQP_LOCALE_EN_US, LStart.Locales]);
     TAMQPLogger.Debug(
       FLogger,
       lekConnection,
@@ -156,7 +169,8 @@ begin
       FConnectionId,
       AMQP_CONNECTION_CHANNEL,
       'AMQP connection opened',
-      AMQP_LOG_CONNECTION_OPEN);
+      AMQP_LOG_CONNECTION_OPEN,
+      TAMQPLogger.ElapsedMilliseconds(LStartTick));
   except
     on E: Exception do
     begin
@@ -177,6 +191,7 @@ end;
 function TAMQPConnection.CreateChannel: IAMQPChannel;
 var
   LChannelId: UInt16;
+  LStartTick: UInt64;
 begin
   if FState <> csConnected then
     raise EAMQPConnectionError.Create('Connection must be connected before creating a channel.');
@@ -185,6 +200,7 @@ begin
   if (FTune.ChannelMax > AMQP_NO_CHANNEL_MAX) and (LChannelId > FTune.ChannelMax) then
     raise EAMQPConnectionError.Create('AMQP channel_max negotiated with server was reached.');
 
+  LStartTick := TThread.GetTickCount64;
   SendFrame(TAMQPMethodCodec.BuildChannelOpen(LChannelId));
   ReceiveExpectedMethod(AMQP_CLASS_CHANNEL, AMQP_CHANNEL_OPEN_OK);
   TAMQPLogger.Info(
@@ -193,7 +209,8 @@ begin
     FConnectionId,
     LChannelId,
     'AMQP channel opened',
-    AMQP_LOG_CHANNEL_OPEN);
+    AMQP_LOG_CHANNEL_OPEN,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
 
   Result := TAMQPChannel.Create(LChannelId, FLogger, Self as IAMQPFrameSession);
   Inc(FNextChannelId);
@@ -276,6 +293,8 @@ end;
 function TAMQPConnection.ReceiveExpectedMethod(const AClassId, AMethodId: UInt16): TAMQPFrame;
 var
   LMethod: TAMQPMethodId;
+  LConnectionClose: TAMQPConnectionClose;
+  LConnectionClosedError: EAMQPConnectionClosedError;
   LChannelClose: TAMQPChannelClose;
   LChannelClosedError: EAMQPChannelClosedError;
 begin
@@ -297,8 +316,21 @@ begin
     if (LMethod.ClassId = AMQP_CLASS_CONNECTION) and
        (LMethod.MethodId = AMQP_CONNECTION_CLOSE) then
     begin
+      LConnectionClose := TAMQPMethodCodec.ReadConnectionClose(Result);
       SendConnectionCloseOkIfNeeded(Result);
-      raise EAMQPConnectionError.Create('AMQP server closed the connection during handshake.');
+      LConnectionClosedError := EAMQPConnectionClosedError.Create(
+        LConnectionClose.ReplyCode,
+        LConnectionClose.ReplyText,
+        LConnectionClose.ClassId,
+        LConnectionClose.MethodId);
+      TAMQPLogger.Error(
+        FLogger,
+        lekError,
+        FConnectionId,
+        AMQP_CONNECTION_CHANNEL,
+        AMQP_LOG_CONNECTION_CLOSE,
+        LConnectionClosedError);
+      raise LConnectionClosedError;
     end;
 
     if (LMethod.ClassId = AMQP_CLASS_CHANNEL) and
@@ -306,15 +338,12 @@ begin
     begin
       LChannelClose := TAMQPMethodCodec.ReadChannelClose(Result);
       SendFrame(TAMQPMethodCodec.BuildChannelCloseOk(Result.Channel));
-      LChannelClosedError := EAMQPChannelClosedError.CreateFmt(
-        'AMQP server closed channel %d: %d %s (related method %d.%d).',
-        [
-          Result.Channel,
-          LChannelClose.ReplyCode,
-          LChannelClose.ReplyText,
-          LChannelClose.ClassId,
-          LChannelClose.MethodId
-        ]);
+      LChannelClosedError := EAMQPChannelClosedError.Create(
+        Result.Channel,
+        LChannelClose.ReplyCode,
+        LChannelClose.ReplyText,
+        LChannelClose.ClassId,
+        LChannelClose.MethodId);
       TAMQPLogger.Error(
         FLogger,
         lekError,
