@@ -364,6 +364,16 @@ Para `guest` / `guest`, isso representa:
 #0 guest #0 guest
 ```
 
+Antes de enviar `connection.start-ok`, a biblioteca faz o parse de
+`connection.start` e valida os recursos anunciados pelo broker:
+
+- `Mechanisms` precisa conter `PLAIN`;
+- `Locales` precisa conter `en_US`.
+
+Se algum desses itens não for anunciado, `Connect` levanta
+`EAMQPConnectionError` com a lista informada pelo broker. Essa validação evita
+que a biblioteca envie uma resposta incompatível com o servidor.
+
 `TAMQPConnectionTune` representa os parâmetros negociados com o servidor:
 
 ```pascal
@@ -491,6 +501,16 @@ o byte final `$CE`.
 lê frames até encontrar o método esperado, ignora heartbeats e trata
 `connection.close` enviado pelo servidor.
 
+Quando o broker envia `connection.close`, a biblioteca responde
+`connection.close-ok`, registra o evento e levanta `EAMQPConnectionClosedError`.
+Essa exceção preserva `ReplyCode`, `ReplyText`, `ClassId` e `MethodId`.
+
+Quando o broker envia `channel.close`, a biblioteca responde `channel.close-ok`,
+registra o evento e levanta `EAMQPChannelClosedError`. Essa exceção preserva
+`ChannelId`, `ReplyCode`, `ReplyText`, `ClassId` e `MethodId`, permitindo que o
+usuário diferencie erros como fila inexistente, permissão negada ou operação
+incompatível.
+
 `CreateChannel` so pode ser chamado depois de `Connect`:
 
 ```pascal
@@ -511,6 +531,15 @@ Depois cria o objeto local:
 Result := TAMQPChannel.Create(LChannelId, FLogger);
 Inc(FNextChannelId);
 ```
+
+O fechamento explícito de canal usa o par AMQP:
+
+```text
+Cliente -> channel.close
+Servidor -> channel.close-ok
+```
+
+Esse fluxo é exposto por `IAMQPChannel.Close`.
 
 `Disconnect` tenta fechar a conexão educadamente com:
 
@@ -873,6 +902,12 @@ TAMQPLogEvent = record
   DurationMS: UInt64;
 end;
 ```
+
+`DurationMS` é preenchido nas operações bloqueantes principais já medidas pela
+biblioteca, incluindo `connection.open`, `channel.open`, `queue.declare`,
+`queue.purge`, `queue.delete` e `basic.consume`. O valor representa o tempo
+decorrido entre o envio da operação AMQP e o recebimento do reply esperado,
+quando há reply no protocolo.
 
 `Kind` classifica a area do evento:
 

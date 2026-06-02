@@ -1,6 +1,6 @@
 # Delphi AMQP Core
 
-Status: em desenvolvimento.
+Status: pronto
 
 Delphi AMQP Core é uma biblioteca Delphi open source para comunicação nativa com
 brokers AMQP 0-9-1, com foco inicial em RabbitMQ. O objetivo é permitir
@@ -37,8 +37,8 @@ consumo assíncrono com ack/nack/reject e observabilidade estruturada.
 ## Estrutura
 
 - `src/`: units da biblioteca.
-- `tests/`: testes unitários e integração planejados.
-- `examples/`: projeto de exemplo.
+- `tests/`: testes de contrato e integração RabbitMQ.
+- [`examples/`](examples/README.md): exemplos console e VCL.
 - [`docs/`](docs/README.md): documentação do usuário, arquitetura e guia técnico interno.
 - `plan/`: planejamento de desenvolvimento por etapas.
 - `LICENSE` e `COPYRIGHT`: licenciamento do projeto.
@@ -141,8 +141,8 @@ Factory := TAMQPConnectionFactory.Create(TConsoleLogger.Create);
 ```
 
 Os eventos incluem campos como `Operation`, `ConnectionId`, `ChannelId`,
-`ErrorClass` e `DurationMS`. Sem logger explícito, a biblioteca usa um logger
-nulo interno.
+`ErrorClass` e `DurationMS`. Operações bloqueantes principais registram duração
+em milissegundos. Sem logger explícito, a biblioteca usa um logger nulo interno.
 
 ## RabbitMQ local
 

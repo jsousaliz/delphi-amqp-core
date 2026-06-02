@@ -1,7 +1,6 @@
 # Etapa 6: Consumo Assincrono
 
-Status: implementada inicialmente. Manter este arquivo para revisão final de
-concorrencia, `basic.return` e cenarios de cancelamento remoto.
+Status: implementada.
 
 ## Entregas
 

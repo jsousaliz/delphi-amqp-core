@@ -55,6 +55,7 @@ type
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
   DelphiAMQP.Consumer,
   DelphiAMQP.Logging;
@@ -93,6 +94,7 @@ function TAMQPChannel.BasicConsume(
 var
   LFrame: TAMQPFrame;
   LConsumerTag: string;
+  LStartTick: UInt64;
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
@@ -103,6 +105,7 @@ begin
     FChannelId,
     Format('basic.consume prepared for queue %s', [AQueueName]),
     AMQP_LOG_BASIC_CONSUME);
+  LStartTick := TThread.GetTickCount64;
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicConsume(
     FChannelId,
     AQueueName,
@@ -110,6 +113,14 @@ begin
     AAutoAck));
   LFrame := FSession.ReceiveExpectedMethod(AMQP_CLASS_BASIC, AMQP_BASIC_CONSUME_OK);
   LConsumerTag := TAMQPMethodCodec.ReadBasicConsumeOk(LFrame);
+  TAMQPLogger.Info(
+    FLogger,
+    lekConsume,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('basic.consume opened for queue %s', [AQueueName]),
+    AMQP_LOG_BASIC_CONSUME,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
   Result := TAMQPConsumer.Create(
       AQueueName,
       LConsumerTag,
@@ -148,14 +159,20 @@ begin
 end;
 
 procedure TAMQPChannel.Close;
+var
+  LStartTick: UInt64;
 begin
+  LStartTick := TThread.GetTickCount64;
+  FSession.SendFrame(TAMQPMethodCodec.BuildChannelClose(FChannelId));
+  FSession.ReceiveExpectedMethod(AMQP_CLASS_CHANNEL, AMQP_CHANNEL_CLOSE_OK);
   TAMQPLogger.Info(
     FLogger,
     lekChannel,
     FSession.GetConnectionId,
     FChannelId,
     'Channel closed',
-    AMQP_LOG_CHANNEL_CLOSE);
+    AMQP_LOG_CHANNEL_CLOSE,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
 end;
 
 function TAMQPChannel.GetChannelId: UInt16;
@@ -213,6 +230,7 @@ function TAMQPChannel.QueueDeclare(
 var
   LFrame: TAMQPFrame;
   LDeclareOk: TAMQPQueueDeclareOk;
+  LStartTick: UInt64;
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
@@ -224,6 +242,7 @@ begin
     FChannelId,
     Format('queue.declare requested for %s', [AQueueName]),
     AMQP_LOG_QUEUE_DECLARE);
+  LStartTick := TThread.GetTickCount64;
   FSession.SendFrame(TAMQPMethodCodec.BuildQueueDeclare(
     FChannelId,
     AQueueName,
@@ -235,12 +254,22 @@ begin
   Result.QueueName := LDeclareOk.QueueName;
   Result.MessageCount := LDeclareOk.MessageCount;
   Result.ConsumerCount := LDeclareOk.ConsumerCount;
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.declare completed for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_DECLARE,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
 end;
 
 procedure TAMQPChannel.QueueDelete(
   const AQueueName: string;
   const AIfUnused: Boolean;
   const AIfEmpty: Boolean);
+var
+  LStartTick: UInt64;
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
@@ -251,12 +280,23 @@ begin
     FChannelId,
     Format('queue.delete requested for %s', [AQueueName]),
     AMQP_LOG_QUEUE_DELETE);
+  LStartTick := TThread.GetTickCount64;
   FSession.SendFrame(TAMQPMethodCodec.BuildQueueDelete(FChannelId, AQueueName, AIfUnused, AIfEmpty));
   TAMQPMethodCodec.ReadQueueDeleteOk(
     FSession.ReceiveExpectedMethod(AMQP_CLASS_QUEUE, AMQP_QUEUE_DELETE_OK));
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.delete completed for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_DELETE,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
 end;
 
 procedure TAMQPChannel.QueuePurge(const AQueueName: string);
+var
+  LStartTick: UInt64;
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
@@ -267,9 +307,18 @@ begin
     FChannelId,
     Format('queue.purge requested for %s', [AQueueName]),
     AMQP_LOG_QUEUE_PURGE);
+  LStartTick := TThread.GetTickCount64;
   FSession.SendFrame(TAMQPMethodCodec.BuildQueuePurge(FChannelId, AQueueName));
   TAMQPMethodCodec.ReadQueuePurgeOk(
     FSession.ReceiveExpectedMethod(AMQP_CLASS_QUEUE, AMQP_QUEUE_PURGE_OK));
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.purge completed for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_PURGE,
+    TAMQPLogger.ElapsedMilliseconds(LStartTick));
 end;
 
 function TAMQPChannel.MaxContentBodyPayloadSize: UInt32;

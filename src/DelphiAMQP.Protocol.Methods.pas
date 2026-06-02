@@ -52,6 +52,7 @@ const
   AMQP_SASL_MECHANISM_PLAIN = 'PLAIN';
   AMQP_LOCALE_EN_US = 'en_US';
   AMQP_CONNECTION_CLOSE_REPLY_TEXT = 'Goodbye';
+  AMQP_CHANNEL_CLOSE_REPLY_TEXT = 'Goodbye';
   AMQP_RESERVED_SHORT_STRING = '';
   AMQP_RESERVED_METHOD_CLASS_ID = 0;
   AMQP_RESERVED_METHOD_ID = 0;
@@ -101,6 +102,15 @@ type
     Heartbeat: UInt16;
   end;
 
+  TAMQPConnectionStart = record
+    VersionMajor: Byte;
+    VersionMinor: Byte;
+    Mechanisms: string;
+    Locales: string;
+    function SupportsMechanism(const AMechanism: string): Boolean;
+    function SupportsLocale(const ALocale: string): Boolean;
+  end;
+
   TAMQPQueueDeclareOk = record
     QueueName: string;
     MessageCount: UInt32;
@@ -108,6 +118,13 @@ type
   end;
 
   TAMQPChannelClose = record
+    ReplyCode: UInt16;
+    ReplyText: string;
+    ClassId: UInt16;
+    MethodId: UInt16;
+  end;
+
+  TAMQPConnectionClose = record
     ReplyCode: UInt16;
     ReplyText: string;
     ClassId: UInt16;
@@ -136,6 +153,7 @@ type
       const AProperties: TAMQPBasicProperties); static;
   public
     class function ReadMethodId(const AFrame: TAMQPFrame): TAMQPMethodId; static;
+    class function ReadConnectionStart(const AFrame: TAMQPFrame): TAMQPConnectionStart; static;
     class function BuildConnectionStartOk(
       const AUserName: string;
       const APassword: string): TAMQPFrame; static;
@@ -144,7 +162,9 @@ type
     class function BuildConnectionOpen(const AVirtualHost: string): TAMQPFrame; static;
     class function BuildConnectionClose: TAMQPFrame; static;
     class function BuildConnectionCloseOk: TAMQPFrame; static;
+    class function ReadConnectionClose(const AFrame: TAMQPFrame): TAMQPConnectionClose; static;
     class function BuildChannelOpen(const AChannelId: UInt16): TAMQPFrame; static;
+    class function BuildChannelClose(const AChannelId: UInt16): TAMQPFrame; static;
     class function BuildChannelCloseOk(const AChannelId: UInt16): TAMQPFrame; static;
     class function ReadChannelClose(const AFrame: TAMQPFrame): TAMQPChannelClose; static;
     class function BuildQueueDeclare(
@@ -205,6 +225,18 @@ type
 
 implementation
 
+function ContainsToken(const AText, AToken: string): Boolean;
+var
+  LTokens: TArray<string>;
+  LToken: string;
+begin
+  Result := False;
+  LTokens := AText.Split([' '], TStringSplitOptions.ExcludeEmpty);
+  for LToken in LTokens do
+    if SameText(LToken, AToken) then
+      Exit(True);
+end;
+
 class function TAMQPMethodCodec.BuildChannelOpen(const AChannelId: UInt16): TAMQPFrame;
 var
   LWriter: TAMQPBinaryWriter;
@@ -212,6 +244,19 @@ begin
   LWriter.WriteUInt16(AMQP_CLASS_CHANNEL);
   LWriter.WriteUInt16(AMQP_CHANNEL_OPEN);
   LWriter.WriteShortString(AMQP_RESERVED_SHORT_STRING);
+  Result := TAMQPFrame.Create(AMQP_FRAME_METHOD, AChannelId, LWriter.ToBytes);
+end;
+
+class function TAMQPMethodCodec.BuildChannelClose(const AChannelId: UInt16): TAMQPFrame;
+var
+  LWriter: TAMQPBinaryWriter;
+begin
+  LWriter.WriteUInt16(AMQP_CLASS_CHANNEL);
+  LWriter.WriteUInt16(AMQP_CHANNEL_CLOSE);
+  LWriter.WriteUInt16(AMQP_REPLY_SUCCESS);
+  LWriter.WriteShortString(AMQP_CHANNEL_CLOSE_REPLY_TEXT);
+  LWriter.WriteUInt16(AMQP_RESERVED_METHOD_CLASS_ID);
+  LWriter.WriteUInt16(AMQP_RESERVED_METHOD_ID);
   Result := TAMQPFrame.Create(AMQP_FRAME_METHOD, AChannelId, LWriter.ToBytes);
 end;
 
@@ -501,6 +546,45 @@ begin
   Result.Heartbeat := LReader.ReadUInt16;
 end;
 
+class function TAMQPMethodCodec.ReadConnectionStart(const AFrame: TAMQPFrame): TAMQPConnectionStart;
+var
+  LReader: TAMQPBinaryReader;
+  LMethod: TAMQPMethodId;
+begin
+  LMethod := ReadMethodId(AFrame);
+  if (LMethod.ClassId <> AMQP_CLASS_CONNECTION) or
+     (LMethod.MethodId <> AMQP_CONNECTION_START) then
+    raise EAMQPProtocolError.Create('Expected connection.start frame.');
+
+  LReader := TAMQPBinaryReader.Create(AFrame.Payload);
+  LReader.ReadUInt16;
+  LReader.ReadUInt16;
+  Result.VersionMajor := LReader.ReadUInt8;
+  Result.VersionMinor := LReader.ReadUInt8;
+  LReader.ReadLongString;
+  Result.Mechanisms := TEncoding.UTF8.GetString(LReader.ReadLongString);
+  Result.Locales := TEncoding.UTF8.GetString(LReader.ReadLongString);
+end;
+
+class function TAMQPMethodCodec.ReadConnectionClose(const AFrame: TAMQPFrame): TAMQPConnectionClose;
+var
+  LReader: TAMQPBinaryReader;
+  LMethod: TAMQPMethodId;
+begin
+  LMethod := ReadMethodId(AFrame);
+  if (LMethod.ClassId <> AMQP_CLASS_CONNECTION) or
+     (LMethod.MethodId <> AMQP_CONNECTION_CLOSE) then
+    raise EAMQPProtocolError.Create('Expected connection.close frame.');
+
+  LReader := TAMQPBinaryReader.Create(AFrame.Payload);
+  LReader.ReadUInt16;
+  LReader.ReadUInt16;
+  Result.ReplyCode := LReader.ReadUInt16;
+  Result.ReplyText := LReader.ReadShortString;
+  Result.ClassId := LReader.ReadUInt16;
+  Result.MethodId := LReader.ReadUInt16;
+end;
+
 class function TAMQPMethodCodec.ReadMethodId(const AFrame: TAMQPFrame): TAMQPMethodId;
 var
   LReader: TAMQPBinaryReader;
@@ -702,6 +786,16 @@ begin
     AWriter.WriteUInt64(DateTimeToUnix(AProperties.Timestamp));
   if not AProperties.AppId.IsEmpty then
     AWriter.WriteShortString(AProperties.AppId);
+end;
+
+function TAMQPConnectionStart.SupportsLocale(const ALocale: string): Boolean;
+begin
+  Result := ContainsToken(Locales, ALocale);
+end;
+
+function TAMQPConnectionStart.SupportsMechanism(const AMechanism: string): Boolean;
+begin
+  Result := ContainsToken(Mechanisms, AMechanism);
 end;
 
 end.

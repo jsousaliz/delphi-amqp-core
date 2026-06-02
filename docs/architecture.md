@@ -1,7 +1,5 @@
 # Arquitetura
 
-Status: em desenvolvimento.
-
 Delphi AMQP Core será organizado em camadas pequenas e testáveis.
 
 ## Índice

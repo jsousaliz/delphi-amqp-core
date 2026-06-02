@@ -200,12 +200,6 @@ begin
       Disconnect(Connection);
       PrintCompletedFlow;
     except
-      on E: EAMQPNotImplementedError do
-      begin
-        Writeln('Operacao ainda pendente para a proxima etapa.');
-        Writeln(E.Message);
-        ProcessExitCode := 2;
-      end;
       on E: Exception do
       begin
         Writeln(E.ClassName + ': ' + E.Message);

@@ -1,7 +1,6 @@
 # Etapa 5: Filas e Publicação
 
-Status: implementada inicialmente. Manter este arquivo para revisão final e
-eventuais ajustes de publisher confirms/propriedades.
+Status: implementada.
 
 ## Entregas
 
