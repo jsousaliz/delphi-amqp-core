@@ -15,10 +15,15 @@
 - Consolidar testes de contrato, codec e integração em instruções reproduzíveis.
 - Verificar se arquivos gerados pelo Delphi continuam ignorados antes de
   publicar.
+- Implementar medição real de latência em `DurationMS` para operações
+  bloqueantes principais, como `connection.open`, `channel.open`,
+  `queue.declare`, `queue.purge`, `queue.delete` e `basic.consume`.
 
 ## Definicao de pronto
 
 - Projeto compila limpo.
 - Testes principais passam.
+- Eventos de operações bloqueantes principais registram `DurationMS` quando
+  aplicável.
 - Repositório pronto para publicação.
 - Documentação e exemplos refletem exatamente o estado da API publicada.

@@ -86,26 +86,50 @@ begin
     Exit;
 
   SetState(csConnecting);
-  TAMQPLogger.Emit(FLogger, llInfo, lekConnection,
+  TAMQPLogger.Info(
+    FLogger,
+    lekConnection,
+    FConnectionId,
+    AMQP_CONNECTION_CHANNEL,
     Format('Connecting to %s:%d', [FOptions.Host, FOptions.Port]),
-    FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'tcp.connect');
+    AMQP_LOG_TCP_CONNECT);
 
   try
     FTransport.Connect(FOptions.Host, FOptions.Port, FOptions.ConnectionTimeoutMS);
-    TAMQPLogger.Emit(FLogger, llInfo, lekConnection, 'TCP socket connected',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'tcp.connected');
+    TAMQPLogger.Info(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'TCP socket connected',
+      AMQP_LOG_TCP_CONNECTED);
 
     FTransport.SendBytes(TAMQPFrameCodec.ProtocolHeader);
-    TAMQPLogger.Emit(FLogger, llDebug, lekConnection, 'AMQP protocol header sent',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'protocol.header');
+    TAMQPLogger.Debug(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'AMQP protocol header sent',
+      AMQP_LOG_PROTOCOL_HEADER);
 
     LFrame := ReceiveExpectedMethod(AMQP_CLASS_CONNECTION, AMQP_CONNECTION_START);
-    TAMQPLogger.Emit(FLogger, llDebug, lekConnection, 'connection.start received',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'connection.start');
+    TAMQPLogger.Debug(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'connection.start received',
+      AMQP_LOG_CONNECTION_START);
 
     SendFrame(TAMQPMethodCodec.BuildConnectionStartOk(FOptions.UserName, FOptions.Password));
-    TAMQPLogger.Emit(FLogger, llDebug, lekConnection, 'connection.start-ok sent',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'connection.start-ok');
+    TAMQPLogger.Debug(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'connection.start-ok sent',
+      AMQP_LOG_CONNECTION_START_OK);
 
     LFrame := ReceiveExpectedMethod(AMQP_CLASS_CONNECTION, AMQP_CONNECTION_TUNE);
     LTune := TAMQPMethodCodec.ReadConnectionTune(LFrame);
@@ -114,22 +138,37 @@ begin
     FTune := LTune;
 
     SendFrame(TAMQPMethodCodec.BuildConnectionTuneOk(FTune));
-    TAMQPLogger.Emit(FLogger, llDebug, lekConnection, 'connection.tune-ok sent',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'connection.tune-ok');
+    TAMQPLogger.Debug(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'connection.tune-ok sent',
+      AMQP_LOG_CONNECTION_TUNE_OK);
 
     SendFrame(TAMQPMethodCodec.BuildConnectionOpen(FOptions.VirtualHost));
     ReceiveExpectedMethod(AMQP_CLASS_CONNECTION, AMQP_CONNECTION_OPEN_OK);
 
     SetState(csConnected);
-    TAMQPLogger.Emit(FLogger, llInfo, lekConnection, 'AMQP connection opened',
-      FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'connection.open');
+    TAMQPLogger.Info(
+      FLogger,
+      lekConnection,
+      FConnectionId,
+      AMQP_CONNECTION_CHANNEL,
+      'AMQP connection opened',
+      AMQP_LOG_CONNECTION_OPEN);
   except
     on E: Exception do
     begin
       FTransport.Disconnect;
       SetState(csDisconnected);
-      TAMQPLogger.Emit(FLogger, llError, lekError, E.Message,
-        FConnectionId, AMQP_CONNECTION_CHANNEL, E.ClassName, 'connection.error');
+      TAMQPLogger.Error(
+        FLogger,
+        lekError,
+        FConnectionId,
+        AMQP_CONNECTION_CHANNEL,
+        AMQP_LOG_CONNECTION_ERROR,
+        E);
       raise;
     end;
   end;
@@ -148,8 +187,13 @@ begin
 
   SendFrame(TAMQPMethodCodec.BuildChannelOpen(LChannelId));
   ReceiveExpectedMethod(AMQP_CLASS_CHANNEL, AMQP_CHANNEL_OPEN_OK);
-  TAMQPLogger.Emit(FLogger, llInfo, lekChannel, 'AMQP channel opened',
-    FConnectionId, LChannelId, '', 'channel.open');
+  TAMQPLogger.Info(
+    FLogger,
+    lekChannel,
+    FConnectionId,
+    LChannelId,
+    'AMQP channel opened',
+    AMQP_LOG_CHANNEL_OPEN);
 
   Result := TAMQPChannel.Create(LChannelId, FLogger, Self as IAMQPFrameSession);
   Inc(FNextChannelId);
@@ -160,8 +204,13 @@ begin
   if FState = csDisconnected then
     Exit;
   SetState(csClosing);
-  TAMQPLogger.Emit(FLogger, llInfo, lekConnection, 'Disconnecting',
-    FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'connection.close');
+  TAMQPLogger.Info(
+    FLogger,
+    lekConnection,
+    FConnectionId,
+    AMQP_CONNECTION_CHANNEL,
+    'Disconnecting',
+    AMQP_LOG_CONNECTION_CLOSE);
   if FTransport.Connected then
   begin
     try
@@ -172,8 +221,14 @@ begin
       end;
     except
       on E: Exception do
-        TAMQPLogger.Emit(FLogger, llWarning, lekError, E.Message,
-          FConnectionId, AMQP_CONNECTION_CHANNEL, E.ClassName, 'connection.close-error');
+        TAMQPLogger.Warning(
+          FLogger,
+          lekError,
+          FConnectionId,
+          AMQP_CONNECTION_CHANNEL,
+          E.Message,
+          AMQP_LOG_CONNECTION_CLOSE_ERROR,
+          E.ClassName);
     end;
     FTransport.Disconnect;
   end;
@@ -226,8 +281,13 @@ begin
     Result := ReceiveFrame;
     if Result.FrameType = AMQP_FRAME_HEARTBEAT then
     begin
-      TAMQPLogger.Emit(FLogger, llTrace, lekHeartbeat, 'Heartbeat received',
-        FConnectionId, AMQP_CONNECTION_CHANNEL, '', 'heartbeat.receive');
+      TAMQPLogger.Trace(
+        FLogger,
+        lekHeartbeat,
+        FConnectionId,
+        AMQP_CONNECTION_CHANNEL,
+        'Heartbeat received',
+        AMQP_LOG_HEARTBEAT_RECEIVE);
       Continue;
     end;
 

@@ -115,18 +115,16 @@ var
 begin
   LLogger := TAMQPInMemoryLogger.Create;
   LLogger.Log(Default(TAMQPLogEvent));
-  TAMQPLogger.Emit(
+  TAMQPLogger.Info(
     LLogger,
-    llInfo,
     lekQueue,
-    'queue declared',
     'connection-id',
     1,
-    '',
-    'queue.declare');
+    'queue declared',
+    AMQP_LOG_QUEUE_DECLARE);
 
   AssertTrue(LLogger.Count = 2, 'In-memory logger count mismatch.');
-  AssertTrue(LLogger.ContainsOperation('queue.declare'), 'In-memory logger operation missing.');
+  AssertTrue(LLogger.ContainsOperation(AMQP_LOG_QUEUE_DECLARE), 'In-memory logger operation missing.');
 end;
 
 begin

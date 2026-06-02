@@ -76,8 +76,13 @@ end;
 
 procedure TAMQPChannel.BasicAck(const ADeliveryTag: UInt64; const AMultiple: Boolean);
 begin
-  TAMQPLogger.Emit(FLogger, llDebug, lekAck, 'basic.ack requested',
-    FSession.GetConnectionId, FChannelId, '', 'basic.ack');
+  TAMQPLogger.Debug(
+    FLogger,
+    lekAck,
+    FSession.GetConnectionId,
+    FChannelId,
+    'basic.ack requested',
+    AMQP_LOG_BASIC_ACK);
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicAck(FChannelId, ADeliveryTag, AMultiple));
 end;
 
@@ -91,8 +96,13 @@ var
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
-  TAMQPLogger.Emit(FLogger, llInfo, lekConsume, 'basic.consume prepared for queue ' + AQueueName,
-    FSession.GetConnectionId, FChannelId, '', 'basic.consume');
+  TAMQPLogger.Info(
+    FLogger,
+    lekConsume,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('basic.consume prepared for queue %s', [AQueueName]),
+    AMQP_LOG_BASIC_CONSUME);
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicConsume(
     FChannelId,
     AQueueName,
@@ -115,22 +125,37 @@ procedure TAMQPChannel.BasicNack(
   const AMultiple: Boolean;
   const ARequeue: Boolean);
 begin
-  TAMQPLogger.Emit(FLogger, llDebug, lekNack, 'basic.nack requested',
-    FSession.GetConnectionId, FChannelId, '', 'basic.nack');
+  TAMQPLogger.Debug(
+    FLogger,
+    lekNack,
+    FSession.GetConnectionId,
+    FChannelId,
+    'basic.nack requested',
+    AMQP_LOG_BASIC_NACK);
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicNack(FChannelId, ADeliveryTag, AMultiple, ARequeue));
 end;
 
 procedure TAMQPChannel.BasicReject(const ADeliveryTag: UInt64; const ARequeue: Boolean);
 begin
-  TAMQPLogger.Emit(FLogger, llDebug, lekNack, 'basic.reject requested',
-    FSession.GetConnectionId, FChannelId, '', 'basic.reject');
+  TAMQPLogger.Debug(
+    FLogger,
+    lekNack,
+    FSession.GetConnectionId,
+    FChannelId,
+    'basic.reject requested',
+    AMQP_LOG_BASIC_REJECT);
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicReject(FChannelId, ADeliveryTag, ARequeue));
 end;
 
 procedure TAMQPChannel.Close;
 begin
-  TAMQPLogger.Emit(FLogger, llInfo, lekChannel, 'Channel closed',
-    FSession.GetConnectionId, FChannelId, '', 'channel.close');
+  TAMQPLogger.Info(
+    FLogger,
+    lekChannel,
+    FSession.GetConnectionId,
+    FChannelId,
+    'Channel closed',
+    AMQP_LOG_CHANNEL_CLOSE);
 end;
 
 function TAMQPChannel.GetChannelId: UInt16;
@@ -154,8 +179,13 @@ begin
   if ARoutingKey.Trim.IsEmpty and AExchange.Trim.IsEmpty then
     raise EAMQPError.Create('Routing key or exchange must be informed.');
 
-  TAMQPLogger.Emit(FLogger, llInfo, lekPublish, 'basic.publish requested',
-    FSession.GetConnectionId, FChannelId, '', 'basic.publish');
+  TAMQPLogger.Info(
+    FLogger,
+    lekPublish,
+    FSession.GetConnectionId,
+    FChannelId,
+    'basic.publish requested',
+    AMQP_LOG_BASIC_PUBLISH);
   LBody := AMessage.Body;
   FSession.SendFrame(TAMQPMethodCodec.BuildBasicPublish(
     FChannelId,
@@ -187,8 +217,13 @@ begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
 
-  TAMQPLogger.Emit(FLogger, llInfo, lekQueue, 'queue.declare requested for ' + AQueueName,
-    FSession.GetConnectionId, FChannelId, '', 'queue.declare');
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.declare requested for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_DECLARE);
   FSession.SendFrame(TAMQPMethodCodec.BuildQueueDeclare(
     FChannelId,
     AQueueName,
@@ -209,8 +244,13 @@ procedure TAMQPChannel.QueueDelete(
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
-  TAMQPLogger.Emit(FLogger, llInfo, lekQueue, 'queue.delete requested for ' + AQueueName,
-    FSession.GetConnectionId, FChannelId, '', 'queue.delete');
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.delete requested for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_DELETE);
   FSession.SendFrame(TAMQPMethodCodec.BuildQueueDelete(FChannelId, AQueueName, AIfUnused, AIfEmpty));
   TAMQPMethodCodec.ReadQueueDeleteOk(
     FSession.ReceiveExpectedMethod(AMQP_CLASS_QUEUE, AMQP_QUEUE_DELETE_OK));
@@ -220,8 +260,13 @@ procedure TAMQPChannel.QueuePurge(const AQueueName: string);
 begin
   if AQueueName.Trim.IsEmpty then
     raise EAMQPError.Create('Queue name must not be empty.');
-  TAMQPLogger.Emit(FLogger, llInfo, lekQueue, 'queue.purge requested for ' + AQueueName,
-    FSession.GetConnectionId, FChannelId, '', 'queue.purge');
+  TAMQPLogger.Info(
+    FLogger,
+    lekQueue,
+    FSession.GetConnectionId,
+    FChannelId,
+    Format('queue.purge requested for %s', [AQueueName]),
+    AMQP_LOG_QUEUE_PURGE);
   FSession.SendFrame(TAMQPMethodCodec.BuildQueuePurge(FChannelId, AQueueName));
   TAMQPMethodCodec.ReadQueuePurgeOk(
     FSession.ReceiveExpectedMethod(AMQP_CLASS_QUEUE, AMQP_QUEUE_PURGE_OK));

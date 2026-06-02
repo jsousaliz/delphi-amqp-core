@@ -3,8 +3,36 @@ unit DelphiAMQP.Logging;
 interface
 
 uses
+  System.SysUtils,
   DelphiAMQP.Interfaces,
   DelphiAMQP.Types;
+
+const
+  AMQP_LOG_TCP_CONNECT = 'tcp.connect';
+  AMQP_LOG_TCP_CONNECTED = 'tcp.connected';
+  AMQP_LOG_PROTOCOL_HEADER = 'protocol.header';
+  AMQP_LOG_CONNECTION_START = 'connection.start';
+  AMQP_LOG_CONNECTION_START_OK = 'connection.start-ok';
+  AMQP_LOG_CONNECTION_TUNE_OK = 'connection.tune-ok';
+  AMQP_LOG_CONNECTION_OPEN = 'connection.open';
+  AMQP_LOG_CONNECTION_CLOSE = 'connection.close';
+  AMQP_LOG_CONNECTION_ERROR = 'connection.error';
+  AMQP_LOG_CONNECTION_CLOSE_ERROR = 'connection.close-error';
+  AMQP_LOG_CHANNEL_OPEN = 'channel.open';
+  AMQP_LOG_CHANNEL_CLOSE = 'channel.close';
+  AMQP_LOG_QUEUE_DECLARE = 'queue.declare';
+  AMQP_LOG_QUEUE_DELETE = 'queue.delete';
+  AMQP_LOG_QUEUE_PURGE = 'queue.purge';
+  AMQP_LOG_BASIC_PUBLISH = 'basic.publish';
+  AMQP_LOG_BASIC_CONSUME = 'basic.consume';
+  AMQP_LOG_BASIC_ACK = 'basic.ack';
+  AMQP_LOG_BASIC_NACK = 'basic.nack';
+  AMQP_LOG_BASIC_REJECT = 'basic.reject';
+  AMQP_LOG_BASIC_CANCEL_ERROR = 'basic.cancel-error';
+  AMQP_LOG_CONSUMER_START = 'consumer.start';
+  AMQP_LOG_CONSUMER_STOP = 'consumer.stop';
+  AMQP_LOG_CONSUMER_ERROR = 'consumer.error';
+  AMQP_LOG_HEARTBEAT_RECEIVE = 'heartbeat.receive';
 
 type
   TAMQPLogEventArray = TArray<TAMQPLogEvent>;
@@ -30,6 +58,46 @@ type
   TAMQPLogger = class
   public
     class function Null: IAMQPLogger; static;
+    class procedure Trace(
+      const ALogger: IAMQPLogger;
+      const AKind: TAMQPLogEventKind;
+      const AConnectionId: string;
+      const AChannelId: UInt16;
+      const AMessage: string;
+      const AOperation: string;
+      const ADurationMS: UInt64 = 0); static;
+    class procedure Debug(
+      const ALogger: IAMQPLogger;
+      const AKind: TAMQPLogEventKind;
+      const AConnectionId: string;
+      const AChannelId: UInt16;
+      const AMessage: string;
+      const AOperation: string;
+      const ADurationMS: UInt64 = 0); static;
+    class procedure Info(
+      const ALogger: IAMQPLogger;
+      const AKind: TAMQPLogEventKind;
+      const AConnectionId: string;
+      const AChannelId: UInt16;
+      const AMessage: string;
+      const AOperation: string;
+      const ADurationMS: UInt64 = 0); static;
+    class procedure Warning(
+      const ALogger: IAMQPLogger;
+      const AKind: TAMQPLogEventKind;
+      const AConnectionId: string;
+      const AChannelId: UInt16;
+      const AMessage: string;
+      const AOperation: string;
+      const AErrorClass: string = '';
+      const ADurationMS: UInt64 = 0); static;
+    class procedure Error(
+      const ALogger: IAMQPLogger;
+      const AKind: TAMQPLogEventKind;
+      const AConnectionId: string;
+      const AChannelId: UInt16;
+      const AOperation: string;
+      const AException: Exception); static;
     class procedure Emit(
       const ALogger: IAMQPLogger;
       const ALevel: TAMQPLogLevel;
@@ -44,8 +112,17 @@ type
 
 implementation
 
-uses
-  System.SysUtils;
+class procedure TAMQPLogger.Debug(
+  const ALogger: IAMQPLogger;
+  const AKind: TAMQPLogEventKind;
+  const AConnectionId: string;
+  const AChannelId: UInt16;
+  const AMessage: string;
+  const AOperation: string;
+  const ADurationMS: UInt64);
+begin
+  Emit(ALogger, llDebug, AKind, AMessage, AConnectionId, AChannelId, '', AOperation, ADurationMS);
+end;
 
 class procedure TAMQPLogger.Emit(
   const ALogger: IAMQPLogger;
@@ -75,9 +152,92 @@ begin
   ALogger.Log(LEvent);
 end;
 
+class procedure TAMQPLogger.Error(
+  const ALogger: IAMQPLogger;
+  const AKind: TAMQPLogEventKind;
+  const AConnectionId: string;
+  const AChannelId: UInt16;
+  const AOperation: string;
+  const AException: Exception);
+begin
+  Emit(
+    ALogger,
+    llError,
+    AKind,
+    AException.Message,
+    AConnectionId,
+    AChannelId,
+    AException.ClassName,
+    AOperation);
+end;
+
+class procedure TAMQPLogger.Info(
+  const ALogger: IAMQPLogger;
+  const AKind: TAMQPLogEventKind;
+  const AConnectionId: string;
+  const AChannelId: UInt16;
+  const AMessage: string;
+  const AOperation: string;
+  const ADurationMS: UInt64);
+begin
+  Emit(
+    ALogger,
+    llInfo,
+    AKind,
+    AMessage,
+    AConnectionId,
+    AChannelId,
+    '',
+    AOperation,
+    ADurationMS);
+end;
+
 class function TAMQPLogger.Null: IAMQPLogger;
 begin
   Result := TAMQPNullLogger.Create;
+end;
+
+class procedure TAMQPLogger.Trace(
+  const ALogger: IAMQPLogger;
+  const AKind: TAMQPLogEventKind;
+  const AConnectionId: string;
+  const AChannelId: UInt16;
+  const AMessage: string;
+  const AOperation: string;
+  const ADurationMS: UInt64);
+begin
+  Emit(
+    ALogger,
+    llTrace,
+    AKind,
+    AMessage,
+    AConnectionId,
+    AChannelId,
+    '',
+    AOperation,
+    ADurationMS);
+end;
+
+class procedure TAMQPLogger.Warning(
+  const ALogger: IAMQPLogger;
+  const AKind: TAMQPLogEventKind;
+  const AConnectionId: string;
+  const AChannelId: UInt16;
+  const AMessage: string;
+  const AOperation: string;
+  const AErrorClass: string;
+  const ADurationMS: UInt64);
+begin
+  Emit(
+    ALogger,
+    llWarning,
+    AKind,
+    AMessage,
+    AConnectionId,
+    AChannelId,
+    AErrorClass,
+    AOperation,
+    ADurationMS);
 end;
 
 procedure TAMQPNullLogger.Log(const AEvent: TAMQPLogEvent);

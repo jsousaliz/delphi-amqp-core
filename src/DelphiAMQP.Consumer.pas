@@ -219,8 +219,13 @@ begin
     Exit;
 
   SetRunning(True);
-  TAMQPLogger.Emit(FLogger, llInfo, lekConsume, 'Consumer started for queue ' + FQueueName,
-    FSession.GetConnectionId, ChannelId, '', 'consumer.start');
+  TAMQPLogger.Info(
+    FLogger,
+    lekConsume,
+    FSession.GetConnectionId,
+    ChannelId,
+    Format('Consumer started for queue %s', [FQueueName]),
+    AMQP_LOG_CONSUMER_START);
 
   FThread := TThread.CreateAnonymousThread(
     procedure
@@ -230,8 +235,13 @@ begin
           Execute;
         except
           on E: Exception do
-            TAMQPLogger.Emit(FLogger, llError, lekError, E.Message,
-              FSession.GetConnectionId, ChannelId, E.ClassName, 'consumer.error');
+            TAMQPLogger.Error(
+              FLogger,
+              lekError,
+              FSession.GetConnectionId,
+              ChannelId,
+              AMQP_LOG_CONSUMER_ERROR,
+              E);
         end;
       finally
         SetRunning(False);
@@ -252,8 +262,14 @@ begin
       FSession.SendFrame(TAMQPMethodCodec.BuildBasicCancel(ChannelId, FConsumerTag));
     except
       on E: Exception do
-        TAMQPLogger.Emit(FLogger, llWarning, lekError, E.Message,
-          FSession.GetConnectionId, ChannelId, E.ClassName, 'basic.cancel-error');
+        TAMQPLogger.Warning(
+          FLogger,
+          lekError,
+          FSession.GetConnectionId,
+          ChannelId,
+          E.Message,
+          AMQP_LOG_BASIC_CANCEL_ERROR,
+          E.ClassName);
     end;
   end;
   if FThread <> nil then
@@ -263,8 +279,13 @@ begin
     FThread := nil;
   end;
   SetRunning(False);
-  TAMQPLogger.Emit(FLogger, llInfo, lekConsume, 'Consumer stopped for queue ' + FQueueName,
-    FSession.GetConnectionId, ChannelId, '', 'consumer.stop');
+  TAMQPLogger.Info(
+    FLogger,
+    lekConsume,
+    FSession.GetConnectionId,
+    ChannelId,
+    Format('Consumer stopped for queue %s', [FQueueName]),
+    AMQP_LOG_CONSUMER_STOP);
 end;
 
 function TAMQPConsumer.ReceiveMessageFromDeliver(const ADeliverFrame: TAMQPFrame): IAMQPMessage;

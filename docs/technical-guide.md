@@ -909,19 +909,22 @@ TAMQPLogger.Null
 Esse logger implementa `IAMQPLogger`, mas não faz nada. Assim os fluxos
 internos podem emitir eventos sem testar `nil` em todos os pontos de uso.
 
-`TAMQPLogger.Emit` centraliza a montagem do evento:
+`TAMQPLogger.Emit` centraliza a montagem do evento, mas o código de produção usa
+helpers semânticos para deixar a leitura mais clara:
 
 ```pascal
-TAMQPLogger.Emit(
+TAMQPLogger.Info(
   FLogger,
-  llInfo,
   lekQueue,
-  'queue.declare requested for ' + AQueueName,
   FSession.GetConnectionId,
   FChannelId,
-  '',
-  'queue.declare');
+  Format('queue.declare requested for %s', [AQueueName]),
+  AMQP_LOG_QUEUE_DECLARE);
 ```
+
+As operações de log também ficam em constantes, como
+`AMQP_LOG_QUEUE_DECLARE`, `AMQP_LOG_BASIC_PUBLISH` e
+`AMQP_LOG_CONNECTION_OPEN`, evitando strings soltas espalhadas pelo código.
 
 Para testes existe `TAMQPInMemoryLogger`. Ele guarda os eventos em memória com
 proteção por `TMonitor`, permitindo validar emissão de eventos sem escrever em

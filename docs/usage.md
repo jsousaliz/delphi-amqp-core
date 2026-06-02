@@ -112,6 +112,12 @@ operação foi emitida:
 
 ```pascal
 Logger := TAMQPInMemoryLogger.Create;
-TAMQPLogger.Emit(Logger, llInfo, lekQueue, 'fila declarada', '', 1, '', 'queue.declare');
-Assert(Logger.ContainsOperation('queue.declare'));
+TAMQPLogger.Info(
+  Logger,
+  lekQueue,
+  'connection-id',
+  1,
+  'fila declarada',
+  AMQP_LOG_QUEUE_DECLARE);
+Assert(Logger.ContainsOperation(AMQP_LOG_QUEUE_DECLARE));
 ```
