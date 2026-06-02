@@ -1,7 +1,5 @@
 # IntegrationRabbitMQ
 
-Status: implementado para execução opcional.
-
 Projeto de testes de integração real contra RabbitMQ. Ele valida o fluxo de
 ponta a ponta: conectar, abrir canal, declarar fila, publicar, consumir com ack,
 executar purge, excluir fila, fechar canal e desconectar.

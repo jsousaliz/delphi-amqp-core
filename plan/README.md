@@ -1,7 +1,5 @@
 # Development Plan Delphi AMQP Core
 
-Status: documento ativo.
-
 Este diretorio contem o planejamento operacional do projeto e serve como guia
 para execucao por etapas.
 

@@ -1,7 +1,5 @@
 # Testes
 
-Status: pronto para publicação inicial.
-
 ## Índice
 
 - [ConsoleContracts](#consolecontracts)
