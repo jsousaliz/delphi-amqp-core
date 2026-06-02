@@ -1,11 +1,11 @@
 # Etapa 6: Consumo Assincrono
 
-Status: implementada inicialmente. Manter este arquivo para revisao final de
+Status: implementada inicialmente. Manter este arquivo para revisão final de
 concorrencia, `basic.return` e cenarios de cancelamento remoto.
 
 ## Entregas
 
-- Definir loop de leitura de frames da conexao para rotear entregas por canal e
+- Definir loop de leitura de frames da conexão para rotear entregas por canal e
   consumer tag sem bloquear a thread principal.
 - `basic.consume`.
 - `basic.cancel`.
@@ -16,17 +16,17 @@ concorrencia, `basic.return` e cenarios de cancelamento remoto.
   content header e um ou mais content body frames.
 - Roteamento de eventos assincronos recebidos pelo broker, incluindo
   `basic.return` para publicacoes com `mandatory=True`.
-- Politica explicita de callback: executar em worker thread por padrao e usar
+- Política explícita de callback: executar em worker thread por padrão e usar
   sincronizacao com a main thread apenas quando configurado.
 - Tratamento de cancelamento remoto pelo broker (`basic.cancel`) e fechamento
-  de canal/conexao durante consumo.
+  de canal/conexão durante consumo.
 
 ## Definicao de pronto
 
-- Consumo nao bloqueia thread principal.
+- Consumo não bloqueia thread principal.
 - Ack manual e auto-ack testados.
-- Cancelamento nao gera deadlock.
-- Teste de integracao valida recebimento de payload maior que um frame quando
+- Cancelamento não gera deadlock.
+- Teste de integração valida recebimento de payload maior que um frame quando
   possivel.
-- Documentacao tecnica explica lifecycle do consumer e responsabilidades de
+- Documentação técnica explica lifecycle do consumer e responsabilidades de
   ack/nack/reject.

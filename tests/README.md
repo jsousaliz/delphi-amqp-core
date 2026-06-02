@@ -1,11 +1,11 @@
 # Testes
 
-`tests/ConsoleContracts/DelphiAMQP.Tests.Console.dpr` contem testes simples sem
-dependencias externas. Ele valida:
+`tests/ConsoleContracts/DelphiAMQP.Tests.Console.dpr` contém testes simples sem
+dependências externas. Ele valida:
 
-- Defaults de configuracao.
-- Conversao de mensagem texto/binario.
+- Defaults de configuração.
+- Conversão de mensagem texto/binário.
 - Encode/decode inicial de frames AMQP.
 
-Testes de integracao com RabbitMQ serao adicionados quando o transporte TCP e o
+Testes de integração com RabbitMQ serão adicionados quando o transporte TCP e o
 handshake AMQP estiverem implementados.

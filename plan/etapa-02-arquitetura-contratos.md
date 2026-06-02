@@ -3,12 +3,12 @@
 ## Entregas
 
 - Interfaces publicas.
-- Tipos de configuracao, erros e eventos.
+- Tipos de configuração, erros e eventos.
 - Logger inicial.
 - Ownership via interfaces.
 
 ## Definicao de pronto
 
-- Units compilaveis com contratos publicos.
-- Defaults de configuracao definidos.
+- Units compiláveis com contratos públicos.
+- Defaults de configuração definidos.
 - Sem comunicacao real obrigatoria nesta etapa.

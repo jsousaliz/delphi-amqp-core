@@ -2,17 +2,17 @@
 
 ## Entregas
 
-- Revisao da API publica.
+- Revisão da API pública.
 - Consolidacao de testes.
 - Guia de contribuicao.
 - Preparacao de versao.
 - Revisar compatibilidade de unidades e paths no Delphi 10.4+ Win64.
-- Revisar possiveis deadlocks no fechamento de conexao, canais e consumers.
+- Revisar possíveis deadlocks no fechamento de conexão, canais e consumers.
 - Revisar tratamento de erros AMQP recebidos via `connection.close` e
   `channel.close`, incluindo reply code/reply text.
 - Validar `connection.start` de forma completa, incluindo mecanismos SASL e
   locales anunciados pelo broker.
-- Consolidar testes de contrato, codec e integracao em instrucoes reproduziveis.
+- Consolidar testes de contrato, codec e integração em instruções reproduzíveis.
 - Verificar se arquivos gerados pelo Delphi continuam ignorados antes de
   publicar.
 
@@ -20,5 +20,5 @@
 
 - Projeto compila limpo.
 - Testes principais passam.
-- Repositorio pronto para publicacao.
-- Documentacao e exemplos refletem exatamente o estado da API publicada.
+- Repositório pronto para publicação.
+- Documentação e exemplos refletem exatamente o estado da API publicada.

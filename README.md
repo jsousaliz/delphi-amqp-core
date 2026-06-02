@@ -1,39 +1,39 @@
 # Delphi AMQP Core
 
-Delphi AMQP Core e uma biblioteca Delphi open source para comunicacao nativa com
-brokers AMQP 0-9-1, com foco inicial em RabbitMQ. O objetivo e permitir
+Delphi AMQP Core é uma biblioteca Delphi open source para comunicação nativa com
+brokers AMQP 0-9-1, com foco inicial em RabbitMQ. O objetivo é permitir
 conectar, publicar, consumir, monitorar e administrar filas sem depender de
 componentes Delphi externos.
 
-Status atual: fundacao do projeto, contratos publicos, codec inicial, transporte
-TCP, handshake AMQP 0-9-1, abertura de canal, operacoes de fila, publicacao,
-consumo assincrono com ack/nack/reject e observabilidade estruturada.
+Status atual: fundação do projeto, contratos públicos, codec inicial, transporte
+TCP, handshake AMQP 0-9-1, abertura de canal, operações de fila, publicação,
+consumo assíncrono com ack/nack/reject e observabilidade estruturada.
 
 ## Objetivos
 
 - AMQP 0-9-1 nativo, inicialmente validado com RabbitMQ.
-- API baseada em interfaces para reduzir controle manual de memoria.
-- Consumo assincrono para nao bloquear a thread principal.
+- API baseada em interfaces para reduzir controle manual de memória.
+- Consumo assíncrono para não bloquear a thread principal.
 - Observabilidade por interface de logger estruturado.
-- Exemplos didaticos em projeto separado.
-- Licenca MIT.
+- Exemplos didáticos em projeto separado.
+- Licença MIT.
 
 ## Estrutura
 
 - `src/`: units da biblioteca.
-- `tests/`: testes unitarios e integracao planejados.
+- `tests/`: testes unitários e integração planejados.
 - `examples/`: projeto de exemplo.
-- `docs/`: documentacao do usuario, arquitetura e guia tecnico interno.
+- `docs/`: documentação do usuário, arquitetura e guia técnico interno.
 - `plan/`: planejamento de desenvolvimento por etapas.
 - `LICENSE` e `COPYRIGHT`: licenciamento do projeto.
 
 ## Planejamento de desenvolvimento
 
 O planejamento incremental do componente fica em `plan/`. O arquivo principal
-`plan/README.md` lista as etapas e cada arquivo detalha entregas, definicao de
-pronto e pendencias conhecidas.
+`plan/README.md` lista as etapas e cada arquivo detalha entregas, definição de
+pronto e pendências conhecidas.
 
-## Uso basico
+## Uso básico
 
 ```pascal
 var
@@ -56,13 +56,13 @@ begin
 
   Channel := Connection.CreateChannel;
   Channel.QueueDeclare('delphiamqp.demo', True, False, False);
-  Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola AMQP'));
+  Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Olá AMQP'));
 
   Connection.Disconnect;
 end;
 ```
 
-## Consumo assincrono
+## Consumo assíncrono
 
 ```pascal
 Consumer := Channel.BasicConsume(
@@ -80,26 +80,26 @@ Consumer := Channel.BasicConsume(
 Consumer.Start;
 ```
 
-O callback podera ser executado em worker thread ou sincronizado com a thread
-principal, conforme configuracao.
+O callback poderá ser executado em worker thread ou sincronizado com a thread
+principal, conforme configuração.
 
 ## Exemplo
 
 O projeto em `examples/ConsolePublisherConsumer` demonstra:
 
-- Conexao com RabbitMQ local.
-- Criacao de fila.
-- Publicacao de mensagem.
+- Conexão com RabbitMQ local.
+- Criação de fila.
+- Publicação de mensagem.
 - Purge e delete de fila.
-- Consumo assincrono com ack manual.
+- Consumo assíncrono com ack manual.
 
-Na etapa atual, conexao, abertura de canal, criacao de fila, publicacao,
-consumo, ack, purge e delete ja sao executados contra RabbitMQ.
+Na etapa atual, conexão, abertura de canal, criação de fila, publicação,
+consumo, ack, purge e delete já são executados contra RabbitMQ.
 
 ## Observabilidade
 
 Passe um `IAMQPLogger` para `TAMQPConnectionFactory.Create` para receber eventos
-estruturados de conexao, canal, fila, publish, consume, ack/nack/reject,
+estruturados de conexão, canal, fila, publish, consume, ack/nack/reject,
 heartbeat e erro.
 
 ```pascal
@@ -107,44 +107,44 @@ Factory := TAMQPConnectionFactory.Create(TConsoleLogger.Create);
 ```
 
 Os eventos incluem campos como `Operation`, `ConnectionId`, `ChannelId`,
-`ErrorClass` e `DurationMS`. Sem logger explicito, a biblioteca usa um logger
+`ErrorClass` e `DurationMS`. Sem logger explícito, a biblioteca usa um logger
 nulo interno.
 
 ## RabbitMQ local
 
-Uma forma simples de validar futuramente os testes de integracao:
+Uma forma simples de validar futuramente os testes de integração:
 
 ```powershell
 docker run --rm -it -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
-Credenciais padrao:
+Credenciais padrão:
 
-- Usuario: `guest`
+- Usuário: `guest`
 - Senha: `guest`
 - Host: `localhost`
 - Porta AMQP: `5672`
 
 ## Roadmap
 
-1. Fundacao do repositorio e documentacao.
-2. Contratos publicos e arquitetura.
+1. Fundação do repositório e documentação.
+2. Contratos públicos e arquitetura.
 3. Codec AMQP 0-9-1.
-4. Conexao TCP, handshake e canais.
-5. Operacoes de fila e publicacao.
-6. Consumo assincrono.
+4. Conexão TCP, handshake e canais.
+5. Operações de fila e publicação.
+6. Consumo assíncrono.
 7. Observabilidade.
 8. Projeto de exemplo completo.
-9. Documentacao final.
-10. Preparacao open source.
+9. Documentação final.
+10. Preparação open source.
 
-## Documentacao tecnica
+## Documentação técnica
 
-O funcionamento interno do transporte TCP, frames AMQP, metodos de handshake e
-orquestracao da conexao esta documentado em `docs/technical-guide.md`. Este
-arquivo deve ser mantido como documentacao viva conforme novas etapas forem
+O funcionamento interno do transporte TCP, frames AMQP, métodos de handshake e
+orquestração da conexão está documentado em `docs/technical-guide.md`. Este
+arquivo deve ser mantido como documentação viva conforme novas etapas forem
 implementadas.
 
-## Licenca
+## Licença
 
 MIT. Veja `LICENSE`.

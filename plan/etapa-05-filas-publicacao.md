@@ -1,15 +1,15 @@
-# Etapa 5: Filas e Publicacao
+# Etapa 5: Filas e Publicação
 
-Status: implementada inicialmente. Manter este arquivo para revisao final e
+Status: implementada inicialmente. Manter este arquivo para revisão final e
 eventuais ajustes de publisher confirms/propriedades.
 
 ## Entregas
 
-- Revisar a fronteira interna entre conexao e canal para permitir que o canal
+- Revisar a fronteira interna entre conexão e canal para permitir que o canal
   envie frames e aguarde replies pelo `ChannelId` sem expor transporte TCP na
-  API publica.
+  API pública.
 - Parsear `connection.start` para validar se o servidor anunciou mecanismo
-  `PLAIN` e locale `en_US`; se nao houver suporte, retornar erro claro.
+  `PLAIN` e locale `en_US`; se não houver suporte, retornar erro claro.
 - Implementar helpers de protocolo para bits AMQP, field table vazia, content
   header e content body.
 - Adicionar constantes AMQP de `queue` e `basic` com nomes explicitos.
@@ -20,13 +20,13 @@ eventuais ajustes de publisher confirms/propriedades.
 - Propriedades basicas de mensagem.
 - Leitura dos replies: `queue.declare-ok`, `queue.delete-ok`, `queue.purge-ok`
   e retorno controlado para `basic.publish` quando aplicavel.
-- Documentar que publisher confirms ainda nao fazem parte desta etapa, salvo
+- Documentar que publisher confirms ainda não fazem parte desta etapa, salvo
   decisao explicita antes da implementacao.
 
 ## Definicao de pronto
 
 - Exemplo cria fila, publica, limpa e remove fila.
-- Teste de integracao valida operacoes AMQP.
-- Testes unitarios validam encode dos metodos de `queue` e `basic.publish`.
-- Documentacao tecnica explica frames de metodo, content header e content body
-  usados na publicacao.
+- Teste de integração valida operações AMQP.
+- Testes unitários validam encode dos métodos de `queue` e `basic.publish`.
+- Documentação técnica explica frames de método, content header e content body
+  usados na publicação.

@@ -5,11 +5,11 @@
 - Estrutura inicial de pastas.
 - `LICENSE` MIT.
 - `COPYRIGHT`.
-- `.gitignore` para Delphi, binarios e caches.
+- `.gitignore` para Delphi, binários e caches.
 - `README.md` inicial.
 
 ## Definicao de pronto
 
 - Estrutura navegavel.
-- Licenca e copyright presentes.
+- Licença e copyright presentes.
 - README explica objetivo e roadmap.

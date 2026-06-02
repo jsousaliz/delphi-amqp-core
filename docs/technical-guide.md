@@ -1,14 +1,14 @@
-# Guia Tecnico do Delphi AMQP Core
+# Guia Técnico do Delphi AMQP Core
 
-Este documento explica como o componente funciona internamente. A ideia e
-manter a implementacao transparente para usuarios avancados e contribuidores.
+Este documento explica como o componente funciona internamente. A ideia é
+manter a implementação transparente para usuários avançados e contribuidores.
 
 Status: documento vivo. Ele deve ser atualizado conforme novas etapas do
 componente forem implementadas.
 
 ## 1. Visao Geral do `Connect`
 
-Quando o usuario chama:
+Quando o usuário chama:
 
 ```pascal
 Connection.Connect;
@@ -16,10 +16,10 @@ Connection.Connect;
 
 a biblioteca faz duas coisas diferentes:
 
-- abre uma conexao TCP com o broker;
-- conversa AMQP 0-9-1 por cima dessa conexao TCP.
+- abre uma conexão TCP com o broker;
+- conversa AMQP 0-9-1 por cima dessa conexão TCP.
 
-TCP e apenas o transporte de bytes. AMQP e o protocolo que da significado a
+TCP é apenas o transporte de bytes. AMQP é o protocolo que dá significado a
 esses bytes.
 
 Fluxo conceitual:
@@ -31,7 +31,7 @@ Delphi AMQP Core
   -> RabbitMQ
 ```
 
-No codigo, a abertura TCP acontece em:
+No código, a abertura TCP acontece em:
 
 ```pascal
 FTransport.Connect(FOptions.Host, FOptions.Port, FOptions.ConnectionTimeoutMS);
@@ -43,7 +43,7 @@ Depois a conversa AMQP comeca com:
 FTransport.SendBytes(TAMQPFrameCodec.ProtocolHeader);
 ```
 
-O header inicial AMQP e:
+O header inicial AMQP é:
 
 ```text
 A M Q P 0 0 9 1
@@ -85,7 +85,7 @@ RabbitMQ
 
 Arquivo principal: `src/DelphiAMQP.Transport.Tcp.pas`.
 
-`TAMQPTcpTransport` e a camada mais baixa da biblioteca. Ela nao conhece AMQP,
+`TAMQPTcpTransport` é a camada mais baixa da biblioteca. Ela não conhece AMQP,
 RabbitMQ, fila, exchange ou mensagem. Ela sabe apenas:
 
 ```pascal
@@ -105,7 +105,7 @@ WSAStartup(WINSOCK_VERSION_2_2, LData)
 `WINSOCK_VERSION_2_2` representa WinSock 2.2. A constante evita que o valor
 hexadecimal `$0202` fique sem contexto no fluxo principal.
 
-Depois o socket e criado com:
+Depois o socket é criado com:
 
 ```pascal
 FSocket := socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -114,17 +114,17 @@ FSocket := socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 Significado:
 
 - `AF_INET`: IPv4.
-- `SOCK_STREAM`: conexao orientada a fluxo.
+- `SOCK_STREAM`: conexão orientada a fluxo.
 - `IPPROTO_TCP`: protocolo TCP.
 
-O endereco e montado com `TSockAddrIn`:
+O endereço é montado com `TSockAddrIn`:
 
 ```pascal
 LAddr.sin_family := AF_INET;
 LAddr.sin_port := htons(APort);
 ```
 
-`htons` converte a porta para network byte order, que e a ordem de bytes usada
+`htons` converte a porta para network byte order, que é a ordem de bytes usada
 em protocolos de rede.
 
 O host pode ser um IP ou um nome:
@@ -133,20 +133,20 @@ O host pode ser um IP ou um nome:
 LAddress := inet_addr(PAnsiChar(AnsiString(AHost)));
 ```
 
-Se nao for IP, ele e resolvido com:
+Se não for IP, ele é resolvido com:
 
 ```pascal
 LHostEnt := gethostbyname(PAnsiChar(AnsiString(AHost)));
 ```
 
-Timeouts de envio e recebimento sao configurados com:
+Timeouts de envio e recebimento são configurados com:
 
 ```pascal
 setsockopt(FSocket, SOL_SOCKET, SO_RCVTIMEO, PAnsiChar(@LTimeout), SizeOf(LTimeout));
 setsockopt(FSocket, SOL_SOCKET, SO_SNDTIMEO, PAnsiChar(@LTimeout), SizeOf(LTimeout));
 ```
 
-A conexao real acontece com:
+A conexão real acontece com:
 
 ```pascal
 Winapi.WinSock.connect(FSocket, LAddr, SizeOf(LAddr));
@@ -163,8 +163,8 @@ begin
 end;
 ```
 
-Recebimento usa `recv`. Como `recv` tambem pode retornar menos bytes do que o
-necessario, a implementacao recebe em loop ate completar a quantidade esperada:
+Recebimento usa `recv`. Como `recv` também pode retornar menos bytes do que o
+necessário, a implementação recebe em loop até completar a quantidade esperada:
 
 ```pascal
 while LTotal < ACount do
@@ -188,7 +188,7 @@ Se nenhum dado chegar dentro do timeout, a biblioteca levanta
 
 Arquivo principal: `src/DelphiAMQP.Protocol.Frame.pas`.
 
-Depois que o TCP esta conectado, AMQP organiza os bytes em frames. Um frame e a
+Depois que o TCP está conectado, AMQP organiza os bytes em frames. Um frame é a
 unidade basica de comunicacao do protocolo.
 
 Formato de um frame AMQP:
@@ -203,7 +203,7 @@ Formato de um frame AMQP:
 +------------------------------------------------+
 ```
 
-No codigo:
+No código:
 
 ```pascal
 TAMQPFrame = record
@@ -240,7 +240,7 @@ begin
 end;
 ```
 
-O numero `10` vira:
+O número `10` vira:
 
 ```text
 00 0A
@@ -259,14 +259,14 @@ LWriter.WriteUInt8(AMQP_FRAME_END);
 `DecodeFrame` faz o inverso: recebe bytes, valida o marcador final `$CE` e
 retorna um `TAMQPFrame`.
 
-Importante: o protocol header `A M Q P 0 0 9 1` nao e um frame. Ele e enviado
-uma unica vez no inicio da conexao. Depois disso, a comunicacao usa frames.
+Importante: o protocol header `A M Q P 0 0 9 1` não é um frame. Ele é enviado
+uma única vez no início da conexão. Depois disso, a comunicação usa frames.
 
-## 4. Metodos AMQP
+## 4. Métodos AMQP
 
 Arquivo principal: `src/DelphiAMQP.Protocol.Methods.pas`.
 
-Um frame do tipo `METHOD` carrega um metodo AMQP. Metodos sao comandos do
+Um frame do tipo `METHOD` carrega um método AMQP. Métodos são comandos do
 protocolo, como:
 
 - `connection.start`
@@ -278,7 +278,7 @@ protocolo, como:
 - `queue.declare`
 - `basic.publish`
 
-Todo payload de metodo comeca com:
+Todo payload de método começa com:
 
 ```text
 2 bytes -> class id
@@ -311,7 +311,7 @@ AMQP_CLASS_CONNECTION = 10;
 AMQP_CLASS_CHANNEL = 20;
 ```
 
-Metodos de conexao:
+Métodos de conexão:
 
 ```pascal
 AMQP_CONNECTION_START = 10;
@@ -322,7 +322,7 @@ AMQP_CONNECTION_OPEN = 40;
 AMQP_CONNECTION_OPEN_OK = 41;
 ```
 
-Metodos de canal:
+Métodos de canal:
 
 ```pascal
 AMQP_CHANNEL_OPEN = 10;
@@ -336,7 +336,7 @@ Result.ClassId := LReader.ReadUInt16;
 Result.MethodId := LReader.ReadUInt16;
 ```
 
-`BuildConnectionStartOk` responde ao `connection.start`, usando autenticacao
+`BuildConnectionStartOk` responde ao `connection.start`, usando autenticação
 `PLAIN`:
 
 ```pascal
@@ -349,7 +349,7 @@ Para `guest` / `guest`, isso representa:
 #0 guest #0 guest
 ```
 
-`TAMQPConnectionTune` representa os parametros negociados com o servidor:
+`TAMQPConnectionTune` representa os parâmetros negociados com o servidor:
 
 ```pascal
 TAMQPConnectionTune = record
@@ -361,8 +361,8 @@ end;
 
 Significado:
 
-- `ChannelMax`: maximo de canais permitidos na conexao.
-- `FrameMax`: tamanho maximo de frame.
+- `ChannelMax`: máximo de canais permitidos na conexão.
+- `FrameMax`: tamanho máximo de frame.
 - `Heartbeat`: intervalo de heartbeat em segundos.
 
 Antes do servidor enviar `connection.tune`, a biblioteca usa valores iniciais
@@ -373,15 +373,15 @@ AMQP_NO_CHANNEL_MAX = 0;
 AMQP_DEFAULT_FRAME_MAX = 131072;
 ```
 
-No AMQP, `channel_max = 0` representa ausencia de limite explicito negociado
-pelo cliente. O valor `131072` bytes e o frame maximo padrao usado pelo AMQP
-0-9-1/RabbitMQ quando nao ha outra negociacao aplicada.
+No AMQP, `channel_max = 0` representa ausência de limite explícito negociado
+pelo cliente. O valor `131072` bytes é o frame máximo padrão usado pelo AMQP
+0-9-1/RabbitMQ quando não há outra negociação aplicada.
 
 `BuildConnectionOpen` abre o virtual host configurado, geralmente `/`.
 
-`BuildChannelOpen` abre um canal AMQP real. Diferente dos metodos de conexao,
-ele usa canal `1`, `2`, `3` etc. O canal `0` e reservado para a propria conexao.
-No codigo:
+`BuildChannelOpen` abre um canal AMQP real. Diferente dos métodos de conexão,
+ele usa canal `1`, `2`, `3` etc. O canal `0` é reservado para a própria conexão.
+No código:
 
 ```pascal
 AMQP_CONNECTION_CHANNEL = 0;
@@ -420,7 +420,7 @@ FTune: TAMQPConnectionTune;
 FNextChannelId := AMQP_FIRST_APPLICATION_CHANNEL;
 ```
 
-Canal `0` e reservado para metodos de conexao:
+Canal `0` é reservado para métodos de conexão:
 
 ```pascal
 AMQP_CONNECTION_CHANNEL = 0;
@@ -428,7 +428,7 @@ AMQP_CONNECTION_CHANNEL = 0;
 
 Canais de trabalho comecam em `1`.
 
-Os valores iniciais de tune tambem usam constantes nomeadas:
+Os valores iniciais de tune também usam constantes nomeadas:
 
 ```pascal
 FTune.ChannelMax := AMQP_NO_CHANNEL_MAX;
@@ -436,13 +436,13 @@ FTune.FrameMax := AMQP_DEFAULT_FRAME_MAX;
 FTune.Heartbeat := FOptions.HeartbeatSeconds;
 ```
 
-Isso evita que numeros como `0`, `1` e `131072` aparecam sem contexto no fluxo
-principal da conexao.
+Isso evita que números como `0`, `1` e `131072` apareçam sem contexto no fluxo
+principal da conexão.
 
 Fluxo de `Connect`:
 
 ```text
-1. Se ja conectado, sai
+1. Se já conectado, sai
 2. Estado = connecting
 3. Abre TCP
 4. Envia protocol header
@@ -455,7 +455,7 @@ Fluxo de `Connect`:
 11. Estado = connected
 ```
 
-O metodo `ReceiveFrame` le um frame inteiro do TCP:
+O método `ReceiveFrame` lê um frame inteiro do TCP:
 
 ```pascal
 LHeader := FTransport.ReceiveBytes(AMQP_FRAME_HEADER_SIZE);
@@ -472,8 +472,8 @@ Sete bytes representam o tamanho fixo do header de frame AMQP:
 Depois ele le `payload size + AMQP_FRAME_END_SIZE`, porque alem do payload vem
 o byte final `$CE`.
 
-`ReceiveExpectedMethod` garante que a sequencia do protocolo esta correta. Ele
-le frames ate encontrar o metodo esperado, ignora heartbeats e trata
+`ReceiveExpectedMethod` garante que a sequência do protocolo está correta. Ele
+lê frames até encontrar o método esperado, ignora heartbeats e trata
 `connection.close` enviado pelo servidor.
 
 `CreateChannel` so pode ser chamado depois de `Connect`:
@@ -497,7 +497,7 @@ Result := TAMQPChannel.Create(LChannelId, FLogger);
 Inc(FNextChannelId);
 ```
 
-`Disconnect` tenta fechar a conexao educadamente com:
+`Disconnect` tenta fechar a conexão educadamente com:
 
 ```text
 Cliente -> connection.close
@@ -511,10 +511,10 @@ Depois fecha o socket TCP.
 Arquivo principal: `src/DelphiAMQP.Internal.Session.pas`.
 
 A Etapa 5 introduziu `IAMQPFrameSession` para separar responsabilidades entre
-conexao e canal.
+conexão e canal.
 
-Antes disso, `TAMQPConnection` era a unica classe capaz de enviar e receber
-frames. Com operacoes como `QueueDeclare` e `Publish`, o canal tambem precisa
+Antes disso, `TAMQPConnection` era a única classe capaz de enviar e receber
+frames. Com operações como `QueueDeclare` e `Publish`, o canal também precisa
 solicitar envio de frames. Em vez de passar o socket TCP para o canal, foi
 criada uma interface interna:
 
@@ -532,20 +532,20 @@ end;
 Ela permite ao canal:
 
 - enviar um frame AMQP;
-- receber o proximo frame AMQP disponivel;
-- esperar um metodo AMQP especifico;
+- receber o próximo frame AMQP disponível;
+- esperar um método AMQP específico;
 - consultar o `frame_max` negociado;
-- obter o identificador local da conexao para diagnostico;
+- obter o identificador local da conexão para diagnóstico;
 - consultar se callbacks de consumo devem rodar na worker thread ou na main
   thread.
 
-Quem implementa essa interface e `TAMQPConnection`:
+Quem implementa essa interface é `TAMQPConnection`:
 
 ```pascal
 TAMQPConnection = class(TInterfacedObject, IAMQPConnection, IAMQPFrameSession)
 ```
 
-Quando a conexao cria um canal, ela passa a si mesma como sessao interna:
+Quando a conexão cria um canal, ela passa a si mesma como sessão interna:
 
 ```pascal
 Result := TAMQPChannel.Create(LChannelId, FLogger, Self as IAMQPFrameSession);
@@ -555,26 +555,26 @@ Assim, a arquitetura fica:
 
 ```text
 TAMQPChannel
-  -> fala em operacoes AMQP de canal
+  -> fala em operações AMQP de canal
 
 IAMQPFrameSession
   -> fronteira interna para envio/recebimento de frames
 
 TAMQPConnection
-  -> controla handshake, leitura de frames e estado da conexao
+  -> controla handshake, leitura de frames e estado da conexão
 
 TAMQPTcpTransport
   -> envia e recebe bytes TCP
 ```
 
-O canal nao conhece `TAMQPTcpTransport`, nao chama `send`/`recv` e nao codifica
-bytes diretamente. Ele trabalha no nivel correto: frames e metodos AMQP.
+O canal não conhece `TAMQPTcpTransport`, não chama `send`/`recv` e não codifica
+bytes diretamente. Ele trabalha no nível correto: frames e métodos AMQP.
 
-## 7. Filas e Publicacao
+## 7. Filas e Publicação
 
 Arquivo principal: `src/DelphiAMQP.Protocol.Methods.pas`.
 
-A Etapa 5 adiciona os metodos AMQP de `queue` e `basic.publish`.
+A Etapa 5 adiciona os métodos AMQP de `queue` e `basic.publish`.
 
 Classes AMQP usadas:
 
@@ -583,9 +583,9 @@ AMQP_CLASS_QUEUE = 50;
 AMQP_CLASS_BASIC = 60;
 ```
 
-### Operacoes de Fila
+### Operações de Fila
 
-Metodos de fila:
+Métodos de fila:
 
 ```pascal
 AMQP_QUEUE_DECLARE = 10;
@@ -597,7 +597,7 @@ AMQP_QUEUE_DELETE_OK = 41;
 ```
 
 `QueueDeclare` envia `queue.declare` e aguarda `queue.declare-ok`. O retorno do
-broker e convertido para:
+broker é convertido para:
 
 ```pascal
 TAMQPQueueDeclareResult = record
@@ -607,7 +607,7 @@ TAMQPQueueDeclareResult = record
 end;
 ```
 
-`queue.declare` contem flags booleanas compactadas em um byte:
+`queue.declare` contém flags booleanas compactadas em um byte:
 
 ```text
 bit 0 -> passive
@@ -623,11 +623,11 @@ O helper `PackBits` transforma um array de booleanos nesses bits:
 LWriter.WriteUInt8(PackBits([False, ADurable, AExclusive, AAutoDelete, False]));
 ```
 
-`QueuePurge` envia `queue.purge` e aguarda `queue.purge-ok`. O parser le a
-quantidade de mensagens removidas, embora a API publica atual seja `procedure`.
+`QueuePurge` envia `queue.purge` e aguarda `queue.purge-ok`. O parser lê a
+quantidade de mensagens removidas, embora a API pública atual seja `procedure`.
 
 `QueueDelete` envia `queue.delete` e aguarda `queue.delete-ok`. As flags usadas
-sao:
+são:
 
 ```text
 bit 0 -> if-unused
@@ -635,9 +635,9 @@ bit 1 -> if-empty
 bit 2 -> no-wait
 ```
 
-### Publicacao
+### Publicação
 
-Publicacao usa tres partes no AMQP:
+Publicação usa três partes no AMQP:
 
 ```text
 basic.publish method frame
@@ -675,7 +675,7 @@ AMQP_BASIC_PROP_DELIVERY_MODE = $1000;
 Se `ContentType` e `DeliveryMode` estiverem preenchidos, o header envia as flags
 e depois os valores na ordem definida pelo protocolo.
 
-O corpo da mensagem e dividido em um ou mais frames quando necessario:
+O corpo da mensagem é dividido em um ou mais frames quando necessário:
 
 ```pascal
 TAMQPMethodCodec.BuildContentBodyFrames(...)
@@ -687,18 +687,18 @@ O limite vem do `frame_max` negociado no handshake:
 Result := FSession.GetFrameMax;
 ```
 
-Publisher confirms ainda nao foram implementados. Na etapa atual, `Publish`
-envia os frames AMQP em ordem e nao aguarda confirmacao individual do broker.
+Publisher confirms ainda não foram implementados. Na etapa atual, `Publish`
+envia os frames AMQP em ordem e não aguarda confirmação individual do broker.
 
-Se `mandatory=True`, o broker pode devolver uma mensagem nao roteavel via
-`basic.return`; esse evento assincrono depende do loop de leitura/roteamento que
-sera implementado junto do consumo.
+Se `mandatory=True`, o broker pode devolver uma mensagem não roteável via
+`basic.return`; esse evento assíncrono depende do loop de leitura/roteamento que
+será implementado junto do consumo.
 
 ## 8. Operacoes no `TAMQPChannel`
 
 Arquivo principal: `src/DelphiAMQP.Channel.pas`.
 
-`TAMQPChannel` executa as operacoes publicas de canal usando `FSession`.
+`TAMQPChannel` executa as operações públicas de canal usando `FSession`.
 
 Campos principais:
 
@@ -769,11 +769,11 @@ AMQP_BASIC_NACK = 120;
 `BasicConsume` envia `basic.consume`, aguarda `basic.consume-ok` e cria um
 `TAMQPConsumer` com a consumer tag retornada pelo broker.
 
-O parametro do callback na API publica e chamado `AMessageHandler`, para deixar
-claro que ele e a rotina responsavel por tratar cada mensagem recebida.
+O parâmetro do callback na API pública é chamado `AMessageHandler`, para deixar
+claro que ele é a rotina responsável por tratar cada mensagem recebida.
 
-Quando `Consumer.Start` e chamado, uma worker thread passa a ler frames da
-sessao interna:
+Quando `Consumer.Start` é chamado, uma worker thread passa a ler frames da
+sessão interna:
 
 ```text
 basic.deliver
@@ -781,8 +781,8 @@ content header
 content body frame(s)
 ```
 
-`basic.deliver` contem consumer tag, delivery tag, exchange, routing key e flag
-de redelivery. O content header contem tamanho total do corpo e propriedades da
+`basic.deliver` contém consumer tag, delivery tag, exchange, routing key e flag
+de redelivery. O content header contém tamanho total do corpo e propriedades da
 mensagem. O corpo pode chegar em um ou mais frames, conforme `frame_max`.
 
 O consumer guarda `FChannel: IAMQPChannel` e deriva o id do canal pela
@@ -796,7 +796,7 @@ const AMessage: IAMQPMessage;
 const AContext: IAMQPConsumerContext;
 ```
 
-Com `AAutoAck=False`, o usuario deve chamar:
+Com `AAutoAck=False`, o usuário deve chamar:
 
 ```pascal
 AContext.Ack;
@@ -805,12 +805,12 @@ AContext.Reject(False);
 ```
 
 Com `AAutoAck=True`, `Ack` vira no-op local e `Nack`/`Reject` levantam erro,
-porque o broker ja considerou a mensagem confirmada.
+porque o broker já considerou a mensagem confirmada.
 
-`Consumer.Stop` envia `basic.cancel` e aguarda a thread encerrar apos receber
+`Consumer.Stop` envia `basic.cancel` e aguarda a thread encerrar após receber
 `basic.cancel-ok` ou cancelamento remoto.
 
-Nao ha mais evento local de parada no consumer. A parada normal e governada pelo
+Não há mais evento local de parada no consumer. A parada normal é governada pelo
 protocolo:
 
 ```text
@@ -821,7 +821,7 @@ Consumer.Stop
 ```
 
 Isso evita que `basic.cancel-ok` fique pendurado no socket e seja lido pela
-proxima operacao sincronizada, como `queue.purge`.
+próxima operação sincronizada, como `queue.purge`.
 
 ## 10. Observabilidade
 
@@ -831,7 +831,7 @@ Arquivos principais:
 - `src/DelphiAMQP.Logging.pas`
 - `src/DelphiAMQP.Factory.pas`
 
-A observabilidade do componente e baseada em uma interface publica:
+A observabilidade do componente é baseada em uma interface pública:
 
 ```pascal
 IAMQPLogger = interface
@@ -841,9 +841,9 @@ end;
 
 Quem usa a biblioteca pode adaptar esse evento para console, arquivo, banco,
 OpenTelemetry, Log4D, logger proprio ou qualquer outro destino. A biblioteca
-nao depende de framework externo de log.
+não depende de framework externo de log.
 
-O evento e estruturado:
+O evento é estruturado:
 
 ```pascal
 TAMQPLogEvent = record
@@ -873,7 +873,7 @@ lekHeartbeat,
 lekError
 ```
 
-`Operation` guarda o nome tecnico da operacao AMQP, como:
+`Operation` guarda o nome técnico da operação AMQP, como:
 
 ```text
 tcp.connect
@@ -891,22 +891,22 @@ basic.cancel
 heartbeat
 ```
 
-Isso permite filtrar logs por operacao sem depender do texto livre de
+Isso permite filtrar logs por operação sem depender do texto livre de
 `Message`.
 
-O logger e definido na factory:
+O logger é definido na factory:
 
 ```pascal
 Factory := TAMQPConnectionFactory.Create(TConsoleLogger.Create);
 ```
 
-Se o usuario nao informar um logger, a factory usa:
+Se o usuário não informar um logger, a factory usa:
 
 ```pascal
 TAMQPLogger.Null
 ```
 
-Esse logger implementa `IAMQPLogger`, mas nao faz nada. Assim os fluxos
+Esse logger implementa `IAMQPLogger`, mas não faz nada. Assim os fluxos
 internos podem emitir eventos sem testar `nil` em todos os pontos de uso.
 
 `TAMQPLogger.Emit` centraliza a montagem do evento:
@@ -923,8 +923,8 @@ TAMQPLogger.Emit(
   'queue.declare');
 ```
 
-Para testes existe `TAMQPInMemoryLogger`. Ele guarda os eventos em memoria com
-proteção por `TMonitor`, permitindo validar emissao de eventos sem escrever em
+Para testes existe `TAMQPInMemoryLogger`. Ele guarda os eventos em memória com
+proteção por `TMonitor`, permitindo validar emissão de eventos sem escrever em
 arquivo externo:
 
 ```pascal
@@ -940,7 +940,7 @@ O exemplo atual executa:
 
 ```text
 criar factory com logger
-configurar host/porta/vhost/usuario/senha
+configurar host/porta/vhost/usuário/senha
 conectar
 abrir canal
 declarar fila
@@ -977,7 +977,7 @@ Consumer := Channel.BasicConsume(
   False);
 
 Consumer.Start;
-Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do Delphi AMQP Core'));
+Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Olá do Delphi AMQP Core'));
 
 if MessageReceived.WaitFor(5000) <> wrSignaled then
   raise Exception.Create('Timeout waiting for consumed message.');
@@ -989,14 +989,14 @@ Channel.QueueDelete('delphiamqp.demo');
 Connection.Disconnect;
 ```
 
-`MessageReceived` e um `TEvent` usado apenas pelo exemplo para a thread
+`MessageReceived` é um `TEvent` usado apenas pelo exemplo para a thread
 principal aguardar ate o callback do consumer sinalizar que a mensagem chegou.
 
 Esse fluxo foi compilado e executado contra RabbitMQ local.
 
 ## Resumo Atual
 
-Nesta etapa, a biblioteca ja consegue:
+Nesta etapa, a biblioteca já consegue:
 
 - abrir socket TCP;
 - falar o header inicial AMQP 0-9-1;
@@ -1008,8 +1008,8 @@ Nesta etapa, a biblioteca ja consegue:
 - publicar mensagens usando `basic.publish`, content header e content body;
 - consumir mensagens com `basic.consume`;
 - confirmar ou rejeitar mensagens com `ack`, `nack` e `reject`;
-- registrar eventos estruturados de conexao, canal, fila, publish, consumo,
+- registrar eventos estruturados de conexão, canal, fila, publish, consumo,
   ack/nack/reject, heartbeat e erro.
 
-As proximas etapas devem expandir esta base com `basic.return` para mensagens
-publicadas com `mandatory=True`, heartbeat ativo e reconexao futura.
+As próximas etapas devem expandir esta base com `basic.return` para mensagens
+publicadas com `mandatory=True`, heartbeat ativo e reconexão futura.
