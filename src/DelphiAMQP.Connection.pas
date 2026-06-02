@@ -276,6 +276,8 @@ end;
 function TAMQPConnection.ReceiveExpectedMethod(const AClassId, AMethodId: UInt16): TAMQPFrame;
 var
   LMethod: TAMQPMethodId;
+  LChannelClose: TAMQPChannelClose;
+  LChannelClosedError: EAMQPChannelClosedError;
 begin
   repeat
     Result := ReceiveFrame;
@@ -301,7 +303,27 @@ begin
 
     if (LMethod.ClassId = AMQP_CLASS_CHANNEL) and
        (LMethod.MethodId = AMQP_CHANNEL_CLOSE) then
-      raise EAMQPConnectionError.Create('AMQP server closed the channel during open.');
+    begin
+      LChannelClose := TAMQPMethodCodec.ReadChannelClose(Result);
+      SendFrame(TAMQPMethodCodec.BuildChannelCloseOk(Result.Channel));
+      LChannelClosedError := EAMQPChannelClosedError.CreateFmt(
+        'AMQP server closed channel %d: %d %s (related method %d.%d).',
+        [
+          Result.Channel,
+          LChannelClose.ReplyCode,
+          LChannelClose.ReplyText,
+          LChannelClose.ClassId,
+          LChannelClose.MethodId
+        ]);
+      TAMQPLogger.Error(
+        FLogger,
+        lekError,
+        FConnectionId,
+        Result.Channel,
+        AMQP_LOG_CHANNEL_CLOSE,
+        LChannelClosedError);
+      raise LChannelClosedError;
+    end;
 
     if (LMethod.ClassId = AClassId) and (LMethod.MethodId = AMethodId) then
       Exit;

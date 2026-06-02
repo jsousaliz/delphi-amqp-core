@@ -9,6 +9,7 @@ type
   EAMQPError = class(Exception);
   EAMQPProtocolError = class(EAMQPError);
   EAMQPConnectionError = class(EAMQPError);
+  EAMQPChannelClosedError = class(EAMQPError);
   EAMQPNotImplementedError = class(EAMQPError);
 
   TAMQPConnectionState = (

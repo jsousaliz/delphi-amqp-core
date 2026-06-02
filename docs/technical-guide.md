@@ -937,63 +937,46 @@ Assert(Logger.ContainsOperation('queue.declare'));
 
 ## 11. Exemplo Validado
 
-Arquivo principal: `examples/ConsolePublisherConsumer/DelphiAMQP.Example.Console.dpr`.
+Arquivo principal: `examples/ConsoleStepByStep/DelphiAMQP.Example.ConsoleStepByStep.dpr`.
 
-O exemplo atual executa:
+O exemplo atual executa o fluxo em rotinas separadas:
 
 ```text
+PrintConfiguration
 criar factory com logger
 configurar host/porta/vhost/usuário/senha
-conectar
-abrir canal
-declarar fila
-registrar consumer
-iniciar consumer
-publicar mensagem
-aguardar callback de recebimento
-confirmar mensagem com ack
-parar consumer
-limpar fila
-deletar fila
-desconectar
+Connect
+OpenChannel
+DeclareQueue
+StartConsumer
+PublishMessage
+WaitForMessage
+StopConsumer
+CleanupQueue
+Disconnect
 ```
 
 Fluxo equivalente:
 
 ```pascal
 Factory := TAMQPConnectionFactory.Create(TConsoleLogger.Create);
+Options := BuildOptions;
 
-Connection := Factory.CreateConnection(Options);
-Connection.Connect;
-
-Channel := Connection.CreateChannel;
-Channel.QueueDeclare('delphiamqp.demo', True, False, False);
-
-Consumer := Channel.BasicConsume(
-  'delphiamqp.demo',
-  procedure(const AMessage: IAMQPMessage; const AContext: IAMQPConsumerContext)
-  begin
-    Writeln('Mensagem recebida: ' + AMessage.AsText);
-    AContext.Ack;
-    MessageReceived.SetEvent;
-  end,
-  False);
-
-Consumer.Start;
-Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Olá do Delphi AMQP Core'));
-
-if MessageReceived.WaitFor(5000) <> wrSignaled then
-  raise Exception.Create('Timeout waiting for consumed message.');
-
-Consumer.Stop;
-Channel.QueuePurge('delphiamqp.demo');
-Channel.QueueDelete('delphiamqp.demo');
-
-Connection.Disconnect;
+Connection := Connect(Factory, Options);
+Channel := OpenChannel(Connection);
+DeclareQueue(Channel);
+Consumer := StartConsumer(Channel, MessageReceived);
+PublishMessage(Channel);
+WaitForMessage(MessageReceived);
+StopConsumer(Consumer);
+CleanupQueue(Channel);
+Disconnect(Connection);
 ```
 
 `MessageReceived` é um `TEvent` usado apenas pelo exemplo para a thread
-principal aguardar ate o callback do consumer sinalizar que a mensagem chegou.
+principal aguardar até o callback do consumer sinalizar que a mensagem chegou.
+O exemplo imprime o id da thread principal e o id da worker thread do callback,
+deixando visível que o consumo não bloqueia a thread principal.
 
 Esse fluxo foi compilado e executado contra RabbitMQ local.
 

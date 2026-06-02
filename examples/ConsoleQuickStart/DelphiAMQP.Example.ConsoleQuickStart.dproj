@@ -1,0 +1,63 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E45A7C35-A0FA-4F17-9B2B-40BC01392836}</ProjectGuid>
+        <ProjectVersion>20.1</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>DelphiAMQP.Example.ConsoleQuickStart.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Base</Config>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+        <AppType>Console</AppType>
+        <ProjectName Condition="'$(ProjectName)'==''">DelphiAMQP.Example.ConsoleQuickStart</ProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UnitSearchPath>..\..\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>DelphiAMQP_Example_ConsoleQuickStart</SanitizedProjectName>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\..\src\DelphiAMQP.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Types.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Interfaces.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Options.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Message.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Logging.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Factory.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Connection.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Channel.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Consumer.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Internal.Session.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Transport.Tcp.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Frame.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Methods.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">DelphiAMQP.Example.ConsoleQuickStart.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

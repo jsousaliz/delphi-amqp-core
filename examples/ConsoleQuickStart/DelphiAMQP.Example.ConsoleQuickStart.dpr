@@ -1,4 +1,4 @@
-program DelphiAMQP.Example.Console;
+program DelphiAMQP.Example.ConsoleQuickStart;
 
 {$APPTYPE CONSOLE}
 
@@ -27,14 +27,9 @@ type
   end;
 
 procedure TConsoleLogger.Log(const AEvent: TAMQPLogEvent);
-var
-  LOperation: string;
 begin
-  LOperation := AEvent.Operation;
-  if LOperation.IsEmpty then
-    LOperation := 'event';
-  Writeln(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', AEvent.Timestamp) +
-    ' [' + LOperation + '] ' + AEvent.Message);
+  Writeln(FormatDateTime('hh:nn:ss.zzz', AEvent.Timestamp) +
+    ' [' + AEvent.Operation + '] ' + AEvent.Message);
 end;
 
 var
@@ -48,18 +43,21 @@ begin
   MessageReceived := TEvent.Create(nil, True, False, '');
   try
     Factory := TAMQPConnectionFactory.Create(TConsoleLogger.Create);
+
     Options := TAMQPConnectionOptions.CreateDefault
       .SetHost('localhost')
       .SetPort(5672)
       .SetVirtualHost('/')
       .SetUserName('guest')
-      .SetPassword('guest');
+      .SetPassword('guest')
+      .SetConsumerDispatchMode(cdmWorkerThread);
 
     Connection := Factory.CreateConnection(Options);
     Connection.Connect;
 
     Channel := Connection.CreateChannel;
     Channel.QueueDeclare('delphiamqp.demo', True, False, False);
+
     Consumer := Channel.BasicConsume(
       'delphiamqp.demo',
       procedure(const AMessage: IAMQPMessage; const AContext: IAMQPConsumerContext)
@@ -72,26 +70,19 @@ begin
     Consumer.Start;
 
     Channel.Publish('', 'delphiamqp.demo', TAMQPMessage.FromText('Ola do Delphi AMQP Core'));
+
     if MessageReceived.WaitFor(5000) <> wrSignaled then
       raise Exception.Create('Timeout waiting for consumed message.');
-    Consumer.Stop;
 
+    Consumer.Stop;
     Channel.QueuePurge('delphiamqp.demo');
     Channel.QueueDelete('delphiamqp.demo');
     Connection.Disconnect;
-    Writeln('Fluxo concluido: connect, channel.open, queue.declare, publish, consume, ack, purge e delete.');
-  except
-    on E: EAMQPNotImplementedError do
-    begin
-      Writeln('Operacao ainda pendente para a proxima etapa.');
-      Writeln(E.Message);
-      Halt(2);
-    end;
-    on E: Exception do
-    begin
-      Writeln(E.ClassName + ': ' + E.Message);
-      Halt(1);
-    end;
+
+    Writeln('Fluxo concluido.');
+    Writeln('Pressione Enter para encerrar...');
+    Readln;
+  finally
+    MessageReceived.Free;
   end;
-  MessageReceived.Free;
 end.

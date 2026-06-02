@@ -107,6 +107,13 @@ type
     ConsumerCount: UInt32;
   end;
 
+  TAMQPChannelClose = record
+    ReplyCode: UInt16;
+    ReplyText: string;
+    ClassId: UInt16;
+    MethodId: UInt16;
+  end;
+
   TAMQPBasicDeliver = record
     ConsumerTag: string;
     DeliveryTag: UInt64;
@@ -138,6 +145,8 @@ type
     class function BuildConnectionClose: TAMQPFrame; static;
     class function BuildConnectionCloseOk: TAMQPFrame; static;
     class function BuildChannelOpen(const AChannelId: UInt16): TAMQPFrame; static;
+    class function BuildChannelCloseOk(const AChannelId: UInt16): TAMQPFrame; static;
+    class function ReadChannelClose(const AFrame: TAMQPFrame): TAMQPChannelClose; static;
     class function BuildQueueDeclare(
       const AChannelId: UInt16;
       const AQueueName: string;
@@ -204,6 +213,14 @@ begin
   LWriter.WriteUInt16(AMQP_CHANNEL_OPEN);
   LWriter.WriteShortString(AMQP_RESERVED_SHORT_STRING);
   Result := TAMQPFrame.Create(AMQP_FRAME_METHOD, AChannelId, LWriter.ToBytes);
+end;
+
+class function TAMQPMethodCodec.BuildChannelCloseOk(const AChannelId: UInt16): TAMQPFrame;
+begin
+  Result := TAMQPFrame.Create(
+    AMQP_FRAME_METHOD,
+    AChannelId,
+    TAMQPFrameCodec.MethodPayload(AMQP_CLASS_CHANNEL, AMQP_CHANNEL_CLOSE_OK));
 end;
 
 class function TAMQPMethodCodec.BuildBasicPublish(
@@ -509,6 +526,25 @@ begin
   LReader.ReadUInt16;
   LReader.ReadUInt16;
   Result := LReader.ReadShortString;
+end;
+
+class function TAMQPMethodCodec.ReadChannelClose(const AFrame: TAMQPFrame): TAMQPChannelClose;
+var
+  LReader: TAMQPBinaryReader;
+  LMethod: TAMQPMethodId;
+begin
+  LMethod := ReadMethodId(AFrame);
+  if (LMethod.ClassId <> AMQP_CLASS_CHANNEL) or
+     (LMethod.MethodId <> AMQP_CHANNEL_CLOSE) then
+    raise EAMQPProtocolError.Create('Expected channel.close frame.');
+
+  LReader := TAMQPBinaryReader.Create(AFrame.Payload);
+  LReader.ReadUInt16;
+  LReader.ReadUInt16;
+  Result.ReplyCode := LReader.ReadUInt16;
+  Result.ReplyText := LReader.ReadShortString;
+  Result.ClassId := LReader.ReadUInt16;
+  Result.MethodId := LReader.ReadUInt16;
 end;
 
 class function TAMQPMethodCodec.ReadBasicDeliver(const AFrame: TAMQPFrame): TAMQPBasicDeliver;

@@ -121,3 +121,31 @@ TAMQPLogger.Info(
   AMQP_LOG_QUEUE_DECLARE);
 Assert(Logger.ContainsOperation(AMQP_LOG_QUEUE_DECLARE));
 ```
+
+## Projetos de exemplo
+
+O projeto `examples/ConsoleQuickStart/DelphiAMQP.Example.ConsoleQuickStart.dproj`
+mostra o fluxo completo em sequência, sem rotinas auxiliares.
+
+O projeto `examples/ConsoleStepByStep/DelphiAMQP.Example.ConsoleStepByStep.dproj`
+mostra o fluxo completo com RabbitMQ local separado em etapas:
+
+- conectar;
+- abrir canal;
+- declarar fila;
+- iniciar consumer assíncrono em worker thread;
+- publicar mensagem;
+- confirmar com ack;
+- parar consumer;
+- executar purge/delete;
+- desconectar.
+
+O projeto `examples/VclQueueManager/DelphiAMQP.Example.VclQueueManager.dproj`
+mostra uma tela VCL com conexão compartilhada, operações de fila, publish,
+consume e logs filtráveis por `Level` e `Kind`.
+
+As instruções de execução ficam em:
+
+- `examples/ConsoleQuickStart/README.md`
+- `examples/ConsoleStepByStep/README.md`
+- `examples/VclQueueManager/README.md`

@@ -83,18 +83,36 @@ Consumer.Start;
 O callback poderá ser executado em worker thread ou sincronizado com a thread
 principal, conforme configuração.
 
-## Exemplo
+## Exemplos
 
-O projeto em `examples/ConsolePublisherConsumer` demonstra:
+O projeto `examples/ConsoleQuickStart` demonstra o uso mínimo e linear da API,
+com o fluxo inteiro em sequência no `begin/end`.
 
-- Conexão com RabbitMQ local.
-- Criação de fila.
-- Publicação de mensagem.
-- Purge e delete de fila.
-- Consumo assíncrono com ack manual.
+O projeto `examples/ConsoleStepByStep` demonstra o mesmo fluxo em etapas
+nomeadas, com saída mais didática no console:
 
-Na etapa atual, conexão, abertura de canal, criação de fila, publicação,
-consumo, ack, purge e delete já são executados contra RabbitMQ.
+- conexão com RabbitMQ local;
+- criação de fila;
+- publicação de mensagem;
+- purge e delete de fila;
+- consumo assíncrono com ack manual;
+- callback executando em worker thread;
+- logs estruturados emitidos no console.
+
+O projeto visual em `examples/VclQueueManager` demonstra uma tela VCL para:
+
+- configurar conexão;
+- criar, limpar e excluir fila;
+- publicar mensagem;
+- iniciar e parar consumo;
+- visualizar mensagens consumidas;
+- visualizar logs com filtro por `Level` e `Kind`.
+
+Veja as instruções completas em:
+
+- `examples/ConsoleQuickStart/README.md`
+- `examples/ConsoleStepByStep/README.md`
+- `examples/VclQueueManager/README.md`
 
 ## Observabilidade
 
