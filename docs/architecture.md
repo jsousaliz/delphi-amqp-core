@@ -1,6 +1,17 @@
 # Arquitetura
 
+Status: em desenvolvimento.
+
 Delphi AMQP Core será organizado em camadas pequenas e testáveis.
+
+## Índice
+
+- [Camadas](#camadas)
+- [Handshake implementado](#handshake-implementado)
+- [Documentação técnica detalhada](#documentação-técnica-detalhada)
+- [Memória](#memória)
+- [Threading](#threading)
+- [Compatibilidade inicial](#compatibilidade-inicial)
 
 ## Camadas
 
@@ -24,7 +35,7 @@ Delphi AMQP Core será organizado em camadas pequenas e testáveis.
 
 ## Documentação técnica detalhada
 
-O guia `technical-guide.md` explica em mais detalhes o transporte TCP, a
+O guia [`technical-guide.md`](technical-guide.md) explica em mais detalhes o transporte TCP, a
 estrutura dos frames AMQP, os métodos de handshake e a orquestração da conexão.
 Constantes de protocolo como canal de conexão, tamanho do header de frame e
 `frame_max` padrão ficam nomeadas nas units de protocolo para evitar números

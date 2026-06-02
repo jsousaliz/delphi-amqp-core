@@ -6,6 +6,21 @@ manter a implementação transparente para usuários avançados e contribuidores
 Status: documento vivo. Ele deve ser atualizado conforme novas etapas do
 componente forem implementadas.
 
+## Índice
+
+- [1. Visao Geral do `Connect`](#1-visao-geral-do-connect)
+- [2. Transporte TCP](#2-transporte-tcp)
+- [3. Frames AMQP](#3-frames-amqp)
+- [4. Métodos AMQP](#4-métodos-amqp)
+- [5. Orquestracao em `TAMQPConnection`](#5-orquestracao-em-tamqpconnection)
+- [6. Sessao Interna de Frames](#6-sessao-interna-de-frames)
+- [7. Filas e Publicação](#7-filas-e-publicação)
+- [8. Operacoes no `TAMQPChannel`](#8-operacoes-no-tamqpchannel)
+- [9. Consumo Assincrono](#9-consumo-assincrono)
+- [10. Observabilidade](#10-observabilidade)
+- [11. Exemplo Validado](#11-exemplo-validado)
+- [Resumo Atual](#resumo-atual)
+
 ## 1. Visao Geral do `Connect`
 
 Quando o usuário chama:

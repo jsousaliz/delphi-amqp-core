@@ -1,12 +1,14 @@
 # Etapa 1: Fundacao do Repositorio
 
+Status: implementada.
+
 ## Entregas
 
 - Estrutura inicial de pastas.
 - `LICENSE` MIT.
 - `COPYRIGHT`.
 - `.gitignore` para Delphi, binários e caches.
-- `README.md` inicial.
+- [`README.md`](../README.md) inicial.
 
 ## Definicao de pronto
 

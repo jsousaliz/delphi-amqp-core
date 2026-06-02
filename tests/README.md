@@ -1,5 +1,9 @@
 # Testes
 
+Status: em desenvolvimento.
+
+## Testes atuais
+
 `tests/ConsoleContracts/DelphiAMQP.Tests.Console.dpr` contém testes simples sem
 dependências externas. Ele valida:
 

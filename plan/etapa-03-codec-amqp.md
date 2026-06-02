@@ -1,5 +1,7 @@
 # Etapa 3: Codec AMQP 0-9-1
 
+Status: implementada.
+
 ## Entregas
 
 - Encode/decode de frames.

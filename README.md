@@ -1,13 +1,29 @@
 # Delphi AMQP Core
 
+Status: em desenvolvimento.
+
 Delphi AMQP Core é uma biblioteca Delphi open source para comunicação nativa com
 brokers AMQP 0-9-1, com foco inicial em RabbitMQ. O objetivo é permitir
 conectar, publicar, consumir, monitorar e administrar filas sem depender de
 componentes Delphi externos.
 
-Status atual: fundação do projeto, contratos públicos, codec inicial, transporte
+Funcionalidades atuais: fundação do projeto, contratos públicos, codec inicial, transporte
 TCP, handshake AMQP 0-9-1, abertura de canal, operações de fila, publicação,
 consumo assíncrono com ack/nack/reject e observabilidade estruturada.
+
+## Índice
+
+- [Objetivos](#objetivos)
+- [Estrutura](#estrutura)
+- [Planejamento de desenvolvimento](#planejamento-de-desenvolvimento)
+- [Uso básico](#uso-básico)
+- [Consumo assíncrono](#consumo-assíncrono)
+- [Exemplos](#exemplos)
+- [Observabilidade](#observabilidade)
+- [RabbitMQ local](#rabbitmq-local)
+- [Roadmap](#roadmap)
+- [Documentação técnica](#documentação-técnica)
+- [Licença](#licença)
 
 ## Objetivos
 
@@ -23,15 +39,15 @@ consumo assíncrono com ack/nack/reject e observabilidade estruturada.
 - `src/`: units da biblioteca.
 - `tests/`: testes unitários e integração planejados.
 - `examples/`: projeto de exemplo.
-- `docs/`: documentação do usuário, arquitetura e guia técnico interno.
+- [`docs/`](docs/README.md): documentação do usuário, arquitetura e guia técnico interno.
 - `plan/`: planejamento de desenvolvimento por etapas.
 - `LICENSE` e `COPYRIGHT`: licenciamento do projeto.
 
 ## Planejamento de desenvolvimento
 
-O planejamento incremental do componente fica em `plan/`. O arquivo principal
-`plan/README.md` lista as etapas e cada arquivo detalha entregas, definição de
-pronto e pendências conhecidas.
+O planejamento incremental do componente fica em [`plan/`](plan/README.md). O arquivo principal
+[`plan/README.md`](plan/README.md) lista as etapas e cada arquivo detalha entregas, definição de
+pronto e observações de implementação.
 
 ## Uso básico
 
@@ -110,9 +126,9 @@ O projeto visual em `examples/VclQueueManager` demonstra uma tela VCL para:
 
 Veja as instruções completas em:
 
-- `examples/ConsoleQuickStart/README.md`
-- `examples/ConsoleStepByStep/README.md`
-- `examples/VclQueueManager/README.md`
+- [`examples/ConsoleQuickStart/README.md`](examples/ConsoleQuickStart/README.md)
+- [`examples/ConsoleStepByStep/README.md`](examples/ConsoleStepByStep/README.md)
+- [`examples/VclQueueManager/README.md`](examples/VclQueueManager/README.md)
 
 ## Observabilidade
 
@@ -130,7 +146,8 @@ nulo interno.
 
 ## RabbitMQ local
 
-Uma forma simples de validar futuramente os testes de integração:
+Para executar os exemplos com RabbitMQ local, instale o Docker Desktop para
+Windows, deixe o Docker em execução e rode:
 
 ```powershell
 docker run --rm -it -p 5672:5672 -p 15672:15672 rabbitmq:3-management
@@ -142,6 +159,7 @@ Credenciais padrão:
 - Senha: `guest`
 - Host: `localhost`
 - Porta AMQP: `5672`
+- Console de administração: `http://localhost:15672`
 
 ## Roadmap
 
@@ -159,7 +177,8 @@ Credenciais padrão:
 ## Documentação técnica
 
 O funcionamento interno do transporte TCP, frames AMQP, métodos de handshake e
-orquestração da conexão está documentado em `docs/technical-guide.md`. Este
+orquestração da conexão está documentado em
+[`docs/technical-guide.md`](docs/technical-guide.md). Este
 arquivo deve ser mantido como documentação viva conforme novas etapas forem
 implementadas.
 

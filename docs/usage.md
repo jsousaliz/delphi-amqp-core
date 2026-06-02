@@ -1,5 +1,17 @@
 # Guia de Uso
 
+Status: em desenvolvimento.
+
+## Índice
+
+- [Instalação manual](#instalação-manual)
+- [Conexão](#conexão)
+- [Publicação](#publicação)
+- [Administração de fila](#administração-de-fila)
+- [Consumo](#consumo)
+- [Observabilidade](#observabilidade)
+- [Projetos de exemplo](#projetos-de-exemplo)
+
 ## Instalação manual
 
 Adicione a pasta `src` ao search path do projeto Delphi ou inclua as units
@@ -146,6 +158,6 @@ consume e logs filtráveis por `Level` e `Kind`.
 
 As instruções de execução ficam em:
 
-- `examples/ConsoleQuickStart/README.md`
-- `examples/ConsoleStepByStep/README.md`
-- `examples/VclQueueManager/README.md`
+- [`examples/ConsoleQuickStart/README.md`](../examples/ConsoleQuickStart/README.md)
+- [`examples/ConsoleStepByStep/README.md`](../examples/ConsoleStepByStep/README.md)
+- [`examples/VclQueueManager/README.md`](../examples/VclQueueManager/README.md)

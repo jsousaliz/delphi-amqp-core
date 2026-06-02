@@ -1,5 +1,7 @@
 # Etapa 10: Qualidade Open Source
 
+Status: planejada.
+
 ## Entregas
 
 - Revisão da API pública.

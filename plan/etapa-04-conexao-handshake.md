@@ -1,5 +1,7 @@
 # Etapa 4: Conexão e Handshake
 
+Status: implementada.
+
 ## Entregas
 
 - Transporte TCP.

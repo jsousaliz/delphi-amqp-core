@@ -1,5 +1,7 @@
 # Etapa 2: Arquitetura e Contratos Publicos
 
+Status: implementada.
+
 ## Entregas
 
 - Interfaces publicas.

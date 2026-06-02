@@ -4,21 +4,21 @@ Status: implementada.
 
 ## Entregas
 
-- [x] Revisar os eventos já existentes e padronizar campos de `ConnectionId`,
+- Revisar os eventos já existentes e padronizar campos de `ConnectionId`,
   `ChannelId`, erro e operação.
-- [x] Eventos estruturados principais para handshake, publish, queue
+- Eventos estruturados principais para handshake, publish, queue
   operations, consume, ack/nack/reject, heartbeat e fechamento.
-- [x] Logger nulo default.
-- [x] Exemplo com logger simples.
-- [x] Test logger em memória para testes unitários.
-- [x] Incluir campo `DurationMS` no evento para medição futura de operações
+- Logger nulo default.
+- Exemplo com logger simples.
+- Test logger em memória para testes unitários.
+- Incluir campo `DurationMS` no evento para medição futura de operações
   bloqueantes.
 
 ## Definicao de pronto
 
-- [x] Fluxos principais emitem eventos.
-- [x] Testes validam eventos sem depender de arquivo externo.
-- [x] Documentação mostra como integrar `IAMQPLogger` com logger próprio do
+- Fluxos principais emitem eventos.
+- Testes validam eventos sem depender de arquivo externo.
+- Documentação mostra como integrar `IAMQPLogger` com logger próprio do
   usuário.
 
 ## Observacoes

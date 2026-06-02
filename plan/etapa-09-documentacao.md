@@ -1,5 +1,7 @@
 # Etapa 9: Documentação Final
 
+Status: em andamento.
+
 ## Entregas
 
 - README completo.
