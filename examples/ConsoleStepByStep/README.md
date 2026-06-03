@@ -27,10 +27,14 @@ Este exemplo organiza o fluxo em rotinas nomeadas para deixar claro cada passo:
 Este exemplo espera um RabbitMQ local acessível em `localhost:5672`.
 
 Para subir o RabbitMQ local, instale o Docker Desktop para Windows, deixe o
-Docker em execução e rode:
+Docker em execução e rode no PowerShell:
 
 ```powershell
-docker run --rm -it -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+docker run -d `
+  --name delphi-amqp-rabbitmq `
+  -p 5672:5672 `
+  -p 15672:15672 `
+  rabbitmq:3-management
 ```
 
 Credenciais padrão usadas pelo exemplo:

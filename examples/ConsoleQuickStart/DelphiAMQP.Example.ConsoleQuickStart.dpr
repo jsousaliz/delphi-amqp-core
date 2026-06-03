@@ -27,9 +27,15 @@ type
   end;
 
 procedure TConsoleLogger.Log(const AEvent: TAMQPLogEvent);
+var
+  LDuration: string;
 begin
+  LDuration := '';
+  if AEvent.DurationMS > 0 then
+    LDuration := Format(' (%d ms)', [AEvent.DurationMS]);
+
   Writeln(FormatDateTime('hh:nn:ss.zzz', AEvent.Timestamp) +
-    ' [' + AEvent.Operation + '] ' + AEvent.Message);
+    ' [' + AEvent.Operation + '] ' + AEvent.Message + LDuration);
 end;
 
 var

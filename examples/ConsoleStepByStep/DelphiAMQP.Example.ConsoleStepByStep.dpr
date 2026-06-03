@@ -39,13 +39,19 @@ type
 
 procedure TConsoleLogger.Log(const AEvent: TAMQPLogEvent);
 var
+  LDuration: string;
   LOperation: string;
 begin
   LOperation := AEvent.Operation;
   if LOperation.IsEmpty then
     LOperation := 'event';
+
+  LDuration := '';
+  if AEvent.DurationMS > 0 then
+    LDuration := Format(' (%d ms)', [AEvent.DurationMS]);
+
   Writeln(FormatDateTime('yyyy-mm-dd hh:nn:ss.zzz', AEvent.Timestamp) +
-    ' [' + LOperation + '] ' + AEvent.Message);
+    ' [' + LOperation + '] ' + AEvent.Message + LDuration);
 end;
 
 procedure PrintConfiguration;

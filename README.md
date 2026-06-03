@@ -147,10 +147,14 @@ em milissegundos. Sem logger explícito, a biblioteca usa um logger nulo interno
 ## RabbitMQ local
 
 Para executar os exemplos com RabbitMQ local, instale o Docker Desktop para
-Windows, deixe o Docker em execução e rode:
+Windows, deixe o Docker em execução e rode no PowerShell:
 
 ```powershell
-docker run --rm -it -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+docker run -d `
+  --name delphi-amqp-rabbitmq `
+  -p 5672:5672 `
+  -p 15672:15672 `
+  rabbitmq:3-management
 ```
 
 Credenciais padrão:
