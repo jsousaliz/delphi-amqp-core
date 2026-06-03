@@ -124,7 +124,8 @@ begin
     on E: Exception do
     begin
       Writeln(E.ClassName + ': ' + E.Message);
-      Writeln('RabbitMQ integration tests require a broker available at AMQP_TEST_HOST:AMQP_TEST_PORT.');
+      Writeln('RabbitMQ integration tests require a valid broker, credentials, virtual host and permissions.');
+      Writeln('Check environment variables AMQP_TEST_HOST, AMQP_TEST_PORT, AMQP_TEST_VHOST, AMQP_TEST_USER and AMQP_TEST_PASSWORD.');
       Halt(1);
     end;
   end;

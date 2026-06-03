@@ -338,6 +338,10 @@ begin
       LItem.SubItems.Add(GetEnumName(TypeInfo(TAMQPLogEventKind), Ord(LEvent.Kind)));
       LItem.SubItems.Add(LEvent.Operation);
       LItem.SubItems.Add(LEvent.ChannelId.ToString);
+      if LEvent.DurationMS > 0 then
+        LItem.SubItems.Add(LEvent.DurationMS.ToString + ' ms')
+      else
+        LItem.SubItems.Add('');
       LItem.SubItems.Add(LEvent.Message);
     end;
   finally

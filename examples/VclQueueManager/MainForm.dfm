@@ -1,4 +1,4 @@
-object VclQueueManagerForm: TMainForm
+object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'Delphi AMQP Core - VCL Queue Manager'
@@ -295,8 +295,12 @@ object VclQueueManagerForm: TMainForm
         Caption = 'Canal'
       end
       item
+        Caption = 'Dura'#231#227'o'
+        Width = 90
+      end
+      item
         Caption = 'Mensagem'
-        Width = 560
+        Width = 445
       end>
     ReadOnly = True
     RowSelect = True

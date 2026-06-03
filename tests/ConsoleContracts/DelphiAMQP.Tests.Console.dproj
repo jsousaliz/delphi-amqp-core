@@ -1,32 +1,74 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{8D8F306E-9330-43F8-A7B3-499EE55A18C2}</ProjectGuid>
-        <ProjectVersion>18.6</ProjectVersion>
+        <ProjectVersion>20.1</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>DelphiAMQP.Tests.Console.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Base</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
-        <TargetedPlatforms>2</TargetedPlatforms>
+        <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Console</AppType>
+        <ProjectName Condition="'$(ProjectName)'==''">DelphiAMQP.Tests.Console</ProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_UnitSearchPath>..\..\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Debug'">
-        <Debug>true</Debug>
-        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release'">
-        <Debug>false</Debug>
-        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <SanitizedProjectName>DelphiAMQP_Tests_Console</SanitizedProjectName>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\..\src\DelphiAMQP.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Types.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Interfaces.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Options.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Message.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Logging.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Factory.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Connection.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Channel.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Consumer.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Internal.Session.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Transport.Tcp.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Frame.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Methods.pas"/>
+        <DCCReference Include="TestSupport\DelphiAMQP.Tests.Assertions.pas"/>
+        <DCCReference Include="TestSupport\DelphiAMQP.Tests.FrameBuilders.pas"/>
+        <DCCReference Include="TestSupport\DelphiAMQP.Tests.FakeFrameSession.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Options.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Message.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.FrameCodec.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.MethodCodec.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Logging.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Channel.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Consumer.pas"/>
+        <DCCReference Include="Cases\DelphiAMQP.Tests.Factory.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
     </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">DelphiAMQP.Tests.Console.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 </Project>
