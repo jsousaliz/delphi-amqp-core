@@ -15,3 +15,4 @@ para execucao por etapas.
 8. [Projeto de exemplo](etapa-08-exemplo.md)
 9. [Documentação final](etapa-09-documentacao.md)
 10. [Qualidade open source](etapa-10-qualidade.md)
+11. [Teste de performance RabbitMQ](etapa-11-performance-rabbitmq.md)

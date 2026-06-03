@@ -1,0 +1,70 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{15F665E8-7C6C-4C6D-90A0-961812E3A113}</ProjectGuid>
+        <ProjectVersion>20.1</ProjectVersion>
+        <FrameworkType>None</FrameworkType>
+        <MainSource>DelphiAMQP.Tests.PerformanceRabbitMQ.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Base</Config>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+        <AppType>Console</AppType>
+        <ProjectName Condition="'$(ProjectName)'==''">DelphiAMQP.Tests.PerformanceRabbitMQ</ProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UnitSearchPath>..\..\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>DelphiAMQP_Tests_PerformanceRabbitMQ</SanitizedProjectName>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\..\src\DelphiAMQP.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Types.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Interfaces.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Options.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Message.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Logging.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Factory.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Connection.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Channel.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Consumer.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Internal.Session.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Transport.Tcp.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Frame.pas"/>
+        <DCCReference Include="..\..\src\DelphiAMQP.Protocol.Methods.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Config.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Load.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Messages.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Report.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Result.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.Runner.pas"/>
+        <DCCReference Include="DelphiAMQP.Tests.Performance.SharedState.pas"/>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">DelphiAMQP.Tests.PerformanceRabbitMQ.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

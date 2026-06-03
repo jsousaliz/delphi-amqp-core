@@ -4,6 +4,7 @@
 
 - [ConsoleContracts](#consolecontracts)
 - [IntegrationRabbitMQ](#integrationrabbitmq)
+- [PerformanceRabbitMQ](#performancerabbitmq)
 - [Organização dos testes de contrato](#organização-dos-testes-de-contrato)
 - [Artefatos gerados](#artefatos-gerados)
 - [Estratégia para pipeline](#estratégia-para-pipeline)
@@ -84,9 +85,25 @@ Ele valida:
 - delete;
 - desconexão.
 
+## PerformanceRabbitMQ
+
+[`PerformanceRabbitMQ`](PerformanceRabbitMQ/README.md) contém teste manual de
+performance contra RabbitMQ real. Esse projeto deve ficar separado dos testes
+obrigatórios de pipeline, pois pode consumir mais recursos e tempo.
+
+Ele será usado para medir:
+
+- múltiplas conexões;
+- consumers concorrentes;
+- publishers concorrentes;
+- mensagens publicadas e consumidas;
+- mensagens faltantes e duplicadas;
+- tempo total e throughput.
+
 ## Estratégia para pipeline
 
 - Rode `ConsoleContracts` em todo commit/pull request.
 - Rode `IntegrationRabbitMQ` em job separado, manual, agendado ou de release.
+- Rode `PerformanceRabbitMQ` manualmente ou em job específico de performance.
 - Quando o CI tiver ambiente Delphi e RabbitMQ disponíveis, o job de integração
   pode subir RabbitMQ como service/container antes de executar o teste.
