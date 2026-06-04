@@ -1,6 +1,7 @@
 # Delphi build artifacts
 __history/
 __recovery/
+posts/
 *.dcu
 *.ddp
 *.dproj.local
