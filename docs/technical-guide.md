@@ -3,7 +3,7 @@
 Este documento explica como o componente funciona internamente. A ideia é
 manter a implementação transparente para usuários avançados e contribuidores.
 
-Status: documento vivo. Ele deve ser atualizado conforme novas etapas do
+Ele deve ser atualizado conforme novas etapas do
 componente forem implementadas.
 
 ## Índice
@@ -987,9 +987,9 @@ Assert(Logger.ContainsOperation('queue.declare'));
 
 ## 11. Exemplo Validado
 
-Arquivo principal: `examples/ConsoleStepByStep/DelphiAMQP.Example.ConsoleStepByStep.dpr`.
+Arquivo principal: `examples/ConsoleQuickStart/DelphiAMQP.Example.ConsoleQuickStart.dpr`.
 
-O exemplo atual executa o fluxo em rotinas separadas:
+O exemplo mantido executa o fluxo completo de forma linear no `begin/end`:
 
 ```text
 PrintConfiguration
